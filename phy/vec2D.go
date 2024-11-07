@@ -93,3 +93,23 @@ func (v *Vec2D) Reverse() {
 	v.x *= -1
 	v.y *= -1
 }
+
+func (v *Vec2D) Rotate(theta float64) {
+	cos := math.Cos(theta)
+	sin := math.Sin(theta)
+
+	v.x = (cos * v.x) - (sin * v.y)
+	v.y = (sin * v.x) + (cos * v.y)
+}
+
+func (v Vec2D) RotateOf(theta, x, y float64) Vec2D {
+	v.x -= x
+	v.y -= y
+
+	v.Rotate(theta)
+
+	v.x += x
+	v.y += y
+
+	return v
+}
