@@ -94,6 +94,10 @@ func (v *Vec2D) Reverse() {
 	v.y *= -1
 }
 
+func (v *Vec2D) Dot(vec Vec2D) float64 {
+	return (v.x * vec.x) + (v.y * vec.y)
+}
+
 func (v *Vec2D) Rotate(theta float64) {
 	cos := math.Cos(theta)
 	sin := math.Sin(theta)
@@ -112,4 +116,43 @@ func (v Vec2D) RotateOf(theta, x, y float64) Vec2D {
 	v.y += y
 
 	return v
+}
+
+func (v Vec2D) Projection(vec Vec2D) Vec2D {
+	p := v.Dot(vec) / (math.Pow(vec.Length(), 2))
+	v.ScalerMul(p)
+
+	return v
+}
+
+func (v Vec2D) Reflection(Nvec Vec2D) Vec2D {
+	r := -2 * (v.Dot(Nvec))
+	v.ScalerMul(r)
+	v.Sub(Nvec)
+
+	return v
+}
+
+func (v Vec2D) AngleBetween(vec Vec2D) float64 {
+	cos := v.Dot(vec) / (v.Length() * vec.Length())
+
+	return math.Acos(cos)
+}
+
+func (v Vec2D) CosAngleBetween(vec Vec2D) float64 {
+	return v.Dot(vec) / (v.Length() * vec.Length())
+}
+
+func (v Vec2D) LeftPerpendicular() Vec2D {
+	return Vec2D{
+		x: -1 * v.y,
+		y: v.x,
+	}
+}
+
+func (v Vec2D) RightPerpendicular() Vec2D {
+	return Vec2D{
+		x: v.y,
+		y: -1 * v.x,
+	}
 }
