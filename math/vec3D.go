@@ -73,8 +73,9 @@ func (v *Vec3D) Length() float64 {
 func (v *Vec3D) Dist(vec Vec3D) float64 {
 	x := v.x - vec.x
 	y := v.y - vec.y
+	z := v.z - vec.z
 
-	return math.Sqrt((x * x) + (y * y))
+	return math.Sqrt((x * x) + (y * y) + (z * z))
 }
 
 func (v *Vec3D) Normalize() float64 {
@@ -82,6 +83,7 @@ func (v *Vec3D) Normalize() float64 {
 	l := v.Length()
 	v.x = v.x / l
 	v.y = v.y / l
+	v.z = v.z / l
 
 	return l
 }
@@ -89,4 +91,73 @@ func (v *Vec3D) Normalize() float64 {
 func (v Vec3D) Directon() Vec3D {
 	v.Normalize()
 	return v
+}
+
+func (v *Vec3D) Reverse() {
+	v.x *= -1
+	v.y *= -1
+	v.z *= -1
+}
+
+func (v *Vec3D) Dot(vec Vec3D) float64 {
+	return (v.x * vec.x) + (v.y * vec.y) + (v.z * vec.z)
+}
+
+func (v *Vec3D) Rotate(theta float64) {
+	cos := math.Cos(theta)
+	sin := math.Sin(theta)
+
+	v.x = (cos * v.x) - (sin * v.y)
+	v.y = (sin * v.x) + (cos * v.y)
+}
+
+func (v Vec3D) RotateOf(theta, x, y float64) Vec3D {
+	v.x -= x
+	v.y -= y
+
+	v.Rotate(theta)
+
+	v.x += x
+	v.y += y
+
+	return v
+}
+
+func (v Vec3D) Projection(vec Vec3D) Vec3D {
+	p := v.Dot(vec) / (math.Pow(vec.Length(), 2))
+	v.ScalerMul(p)
+
+	return v
+}
+
+func (v Vec3D) Reflection(Nvec Vec3D) Vec3D {
+	r := -2 * (v.Dot(Nvec))
+	v.ScalerMul(r)
+	v.Sub(Nvec)
+
+	return v
+}
+
+func (v Vec3D) AngleBetween(vec Vec3D) float64 {
+	cos := v.Dot(vec) / (v.Length() * vec.Length())
+
+	return math.Acos(cos)
+}
+
+func (v Vec3D) CosAngleBetween(vec Vec3D) float64 {
+	return v.Dot(vec) / (v.Length() * vec.Length())
+}
+
+func (v Vec3D) LeftPerpendicular() Vec3D {
+	return Vec3D{
+		x: -1 * v.y,
+		y: v.x,
+	}
+}
+
+func (v Vec3D) RightPerpendicular() Vec3D {
+	return Vec3D{
+		x: v.y,
+		y: -1 * v.x,
+	}
 }
