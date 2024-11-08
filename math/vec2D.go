@@ -1,4 +1,4 @@
-package phy
+package math
 
 import "math"
 
