@@ -103,27 +103,7 @@ func (v *Vec3D) Dot(vec Vec3D) float64 {
 	return (v.x * vec.x) + (v.y * vec.y) + (v.z * vec.z)
 }
 
-func (v *Vec3D) Rotate(theta float64) {
-	cos := math.Cos(theta)
-	sin := math.Sin(theta)
-
-	v.x = (cos * v.x) - (sin * v.y)
-	v.y = (sin * v.x) + (cos * v.y)
-}
-
-func (v Vec3D) RotateOf(theta, x, y float64) Vec3D {
-	v.x -= x
-	v.y -= y
-
-	v.Rotate(theta)
-
-	v.x += x
-	v.y += y
-
-	return v
-}
-
-func (v Vec3D) Projection(vec Vec3D) Vec3D {
+func (v Vec3D) ProjectionOnto(vec Vec3D) Vec3D {
 	p := v.Dot(vec) / (math.Pow(vec.Length(), 2))
 	v.ScalerMul(p)
 
@@ -159,5 +139,41 @@ func (v Vec3D) RightPerpendicular() Vec3D {
 	return Vec3D{
 		x: v.y,
 		y: -1 * v.x,
+	}
+}
+
+func (v *Vec3D) Rotate(theta float64) {
+	cos := math.Cos(theta)
+	sin := math.Sin(theta)
+
+	v.x = (cos * v.x) - (sin * v.y)
+	v.y = (sin * v.x) + (cos * v.y)
+}
+
+func (v Vec3D) RotateOf(theta, x, y float64) Vec3D {
+	v.x -= x
+	v.y -= y
+
+	v.Rotate(theta)
+
+	v.x += x
+	v.y += y
+
+	return v
+}
+
+func OrthoGraphicProjection(point Vec3D) Vec3D {
+	return Vec3D{
+		x: point.x,
+		y: point.y,
+		z: 0,
+	}
+}
+
+func PerspectiveProjection(point Vec3D, focalLen float64) Vec3D {
+	return Vec3D{
+		x: (point.x * focalLen) / point.z,
+		y: (point.y * focalLen) / point.z,
+		z: 0,
 	}
 }
