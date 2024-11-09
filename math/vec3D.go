@@ -1,6 +1,9 @@
 package math
 
-import "math"
+import (
+	"errors"
+	"math"
+)
 
 type Vec3D struct {
 	x float64
@@ -103,6 +106,14 @@ func (v *Vec3D) Dot(vec Vec3D) float64 {
 	return (v.x * vec.x) + (v.y * vec.y) + (v.z * vec.z)
 }
 
+func (v Vec3D) Cross(vec Vec3D) Vec3D {
+	return Vec3D{
+		x: (v.y * vec.z) - (v.z * vec.y),
+		y: (v.z * vec.x) - (v.x * vec.z),
+		z: (v.x * vec.y) - (v.y * vec.x),
+	}
+}
+
 func (v Vec3D) ProjectionOnto(vec Vec3D) Vec3D {
 	p := v.Dot(vec) / (math.Pow(vec.Length(), 2))
 	v.ScalerMul(p)
@@ -111,35 +122,31 @@ func (v Vec3D) ProjectionOnto(vec Vec3D) Vec3D {
 }
 
 func (v Vec3D) Reflection(Nvec Vec3D) Vec3D {
-	r := -2 * (v.Dot(Nvec))
-	v.ScalerMul(r)
-	v.Sub(Nvec)
+	dot := v.Dot(Nvec)
+	magSq := Nvec.Dot(Nvec)
+	Nvec.ScalerMul(2 * (dot / magSq))
 
+	v.Sub(Nvec)
 	return v
 }
 
-func (v Vec3D) AngleBetween(vec Vec3D) float64 {
-	cos := v.Dot(vec) / (v.Length() * vec.Length())
-
-	return math.Acos(cos)
-}
-
-func (v Vec3D) CosAngleBetween(vec Vec3D) float64 {
-	return v.Dot(vec) / (v.Length() * vec.Length())
-}
-
-func (v Vec3D) LeftPerpendicular() Vec3D {
-	return Vec3D{
-		x: -1 * v.y,
-		y: v.x,
+func (v Vec3D) AngleBetween(vec Vec3D) (float64, error) {
+	lenM := v.Length() * vec.Length()
+	if lenM == 0 {
+		return -1, errors.New("Cant divide by zero")
 	}
+
+	cos := v.Dot(vec) / (lenM)
+	return math.Acos(cos), nil
 }
 
-func (v Vec3D) RightPerpendicular() Vec3D {
-	return Vec3D{
-		x: v.y,
-		y: -1 * v.x,
+func (v Vec3D) CosAngleBetween(vec Vec3D) (float64, error) {
+	lenM := v.Length() * vec.Length()
+	if lenM == 0 {
+		return -1, errors.New("Cant divide by zero")
 	}
+
+	return v.Dot(vec) / (lenM), nil
 }
 
 func (v *Vec3D) Rotate(theta float64) {

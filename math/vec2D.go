@@ -98,6 +98,11 @@ func (v *Vec2D) Dot(vec Vec2D) float64 {
 	return (v.x * vec.x) + (v.y * vec.y)
 }
 
+func (v *Vec2D) Cross2D(vec Vec2D) float64 {
+	// Gives the Magnitude of the CrossVec
+	return (v.x * vec.y) - (v.y * vec.x)
+}
+
 func (v *Vec2D) Rotate(theta float64) {
 	cos := math.Cos(theta)
 	sin := math.Sin(theta)
@@ -126,10 +131,11 @@ func (v Vec2D) Projection(vec Vec2D) Vec2D {
 }
 
 func (v Vec2D) Reflection(Nvec Vec2D) Vec2D {
-	r := -2 * (v.Dot(Nvec))
-	v.ScalerMul(r)
-	v.Sub(Nvec)
+	dot := v.Dot(Nvec)
+	magSq := Nvec.Dot(Nvec)
+	Nvec.ScalerMul(2 * (dot / magSq))
 
+	v.Sub(Nvec)
 	return v
 }
 
