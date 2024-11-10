@@ -33,6 +33,17 @@ func (q *Quaternion) SetFromAxisAngle(axis Vec3D, theta float64) {
 	q.z = axis.z * sinHF
 }
 
+func (q *Quaternion) SetFromEulerAngles(roll, pitch, yaw float64) {
+	cosR, sinR := math.Sincos(roll / 2)
+	cosP, sinP := math.Sincos(pitch / 2)
+	cosY, sinY := math.Sincos(yaw / 2)
+
+	q.w = (cosR * cosP * cosY) + (sinR * sinP * sinY)
+	q.x = (sinR * cosP * cosY) - (cosR * sinP * sinY)
+	q.y = (cosR * sinP * cosY) + (sinR * cosP * sinY)
+	q.z = (cosR * cosP * sinY) - (sinR * sinP * cosY)
+}
+
 func (q *Quaternion) SetFromVec3D(v Vec3D) {
 	//Creates a Pure Quarternion from a Vec3d
 	q.w = 0
@@ -157,15 +168,47 @@ func (q Quaternion) MultiplyQt(qt Quaternion) Quaternion {
 	return q
 }
 
-func QtFromAxisAngle(axis Vec3D, theta float64) Quaternion {
-	axis.Normalize()
-	sinHF, cosHF := math.Sincos(theta / 2)
-	q := Quaternion{}
+func (q Quaternion) ToAxisAngle() (Vec3D, float64, error) {
+	_, err := q.Normalize()
+	if err != nil {
+		return Vec3D{}, -1, err
+	}
 
-	q.w = cosHF
-	q.x = axis.x * sinHF
-	q.y = axis.y * sinHF
-	q.z = axis.z * sinHF
+	//TODO: To handle the edge case when q.w == 1 || q.w == -1
 
-	return q
+	angle := 2 * math.Acos(q.w)
+	sinHF := math.Sqrt(1 - (q.w * q.w))
+
+	if angle < 1e-10 {
+		// returns the arbitary axis of rotation
+		return Vec3D{1, 0, 0}, 0, errors.New("Angle Of Rotation Insignificant")
+	}
+
+	axis := Vec3D{
+		x: q.x / sinHF,
+		y: q.y / sinHF,
+		z: q.z / sinHF,
+	}
+
+	_, err = axis.Normalize()
+	if err != nil {
+		return Vec3D{}, angle, err
+	}
+
+	return axis, angle, nil
+}
+
+func (q Quaternion) ToEulerAngles() EulerAngle {
+	roll := math.Atan2(2*((q.w*q.x)+(q.y*q.z)), 1-(2*((q.x*q.x)+(q.y*q.y))))
+
+	sinp := 2 * (q.w*q.y - q.z*q.x)
+	pitch := 0.0
+	if math.Abs(sinp) >= 1 {
+		pitch = math.Copysign(math.Pi/2, sinp)
+	} else {
+		pitch = math.Asin(sinp)
+	}
+
+	yaw := math.Atan2(2*(q.w*q.z+q.x*q.y), 1-2*(q.y*q.y+q.z*q.z))
+
 }
