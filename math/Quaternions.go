@@ -33,10 +33,10 @@ func (q *Quaternion) SetFromAxisAngle(axis Vec3D, theta float64) {
 	q.z = axis.z * sinHF
 }
 
-func (q *Quaternion) SetFromEulerAngles(roll, pitch, yaw float64) {
-	cosR, sinR := math.Sincos(roll / 2)
-	cosP, sinP := math.Sincos(pitch / 2)
-	cosY, sinY := math.Sincos(yaw / 2)
+func (q *Quaternion) SetFromEulerAngles(e EulerAngle) {
+	cosR, sinR := math.Sincos(e.roll / 2)
+	cosP, sinP := math.Sincos(e.pitch / 2)
+	cosY, sinY := math.Sincos(e.yaw / 2)
 
 	q.w = (cosR * cosP * cosY) + (sinR * sinP * sinY)
 	q.x = (sinR * cosP * cosY) - (cosR * sinP * sinY)
@@ -199,16 +199,18 @@ func (q Quaternion) ToAxisAngle() (Vec3D, float64, error) {
 }
 
 func (q Quaternion) ToEulerAngles() EulerAngle {
-	roll := math.Atan2(2*((q.w*q.x)+(q.y*q.z)), 1-(2*((q.x*q.x)+(q.y*q.y))))
+	e := EulerAngle{}
+
+	e.roll = math.Atan2(2*((q.w*q.x)+(q.y*q.z)), 1-(2*((q.x*q.x)+(q.y*q.y))))
 
 	sinp := 2 * (q.w*q.y - q.z*q.x)
-	pitch := 0.0
 	if math.Abs(sinp) >= 1 {
-		pitch = math.Copysign(math.Pi/2, sinp)
+		e.pitch = math.Copysign(math.Pi/2, sinp)
 	} else {
-		pitch = math.Asin(sinp)
+		e.pitch = math.Asin(sinp)
 	}
 
-	yaw := math.Atan2(2*(q.w*q.z+q.x*q.y), 1-2*(q.y*q.y+q.z*q.z))
+	e.yaw = math.Atan2(2*(q.w*q.z+q.x*q.y), 1-2*(q.y*q.y+q.z*q.z))
 
+	return e
 }
