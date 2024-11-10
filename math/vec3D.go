@@ -153,24 +153,40 @@ func (v Vec3D) CosAngleBetween(vec Vec3D) (float64, error) {
 	return v.Dot(vec) / (lenM), nil
 }
 
-func (v *Vec3D) Rotate(theta float64) {
-	cos := math.Cos(theta)
-	sin := math.Sin(theta)
+func (v *Vec3D) Rotate(axis Vec3D, theta float64) error {
+	qRot := QtFromAxisAngle(axis, theta)
+	_, err := qRot.Normalize()
+	if err != nil {
+		return err
+	}
 
-	v.x = (cos * v.x) - (sin * v.y)
-	v.y = (sin * v.x) + (cos * v.y)
+	// As qRot is Normalized So conjugate == inverse
+	qInv := qRot.ConjugateQt()
+
+	qVec := Quaternion{
+		w: 0,
+		x: v.x,
+		y: v.y,
+		z: v.z,
+	}
+
+	qRot.Multiply(qVec)
+	qRot.Multiply(qInv)
+
+	v.x = qRot.x
+	v.y = qRot.y
+	v.z = qRot.z
+
+	return nil
 }
 
-func (v Vec3D) RotateOf(theta, x, y float64) Vec3D {
-	v.x -= x
-	v.y -= y
+func (v Vec3D) RotateVec(axis Vec3D, theta float64) (Vec3D, error) {
+	err := v.Rotate(axis, theta)
+	if err != nil {
+		return Vec3D{}, err
+	}
 
-	v.Rotate(theta)
-
-	v.x += x
-	v.y += y
-
-	return v
+	return v, nil
 }
 
 func OrthoGraphicProjection(point Vec3D) Vec3D {
