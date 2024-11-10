@@ -1,6 +1,9 @@
 package math
 
-import "math"
+import (
+	"errors"
+	"math"
+)
 
 type Vec2D struct {
 	x, y float64
@@ -69,13 +72,17 @@ func (v *Vec2D) Dist(vec Vec2D) float64 {
 	return math.Sqrt((x * x) + (y * y))
 }
 
-func (v *Vec2D) Normalize() float64 {
+func (v *Vec2D) Normalize() (float64, error) {
 	// returns the lengtyh
 	l := v.Length()
+	if l == 0 {
+		return -1, errors.New("The Length Is Zero")
+	}
+
 	v.x = v.x / l
 	v.y = v.y / l
 
-	return l
+	return l, nil
 }
 
 func (v Vec2D) Directon() Vec2D {

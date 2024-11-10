@@ -81,14 +81,18 @@ func (v *Vec3D) Dist(vec Vec3D) float64 {
 	return math.Sqrt((x * x) + (y * y) + (z * z))
 }
 
-func (v *Vec3D) Normalize() float64 {
+func (v *Vec3D) Normalize() (float64, error) {
 	// returns the lengtyh
 	l := v.Length()
+	if l == 0 {
+		return -1, errors.New("The Length Is Zero")
+	}
+
 	v.x = v.x / l
 	v.y = v.y / l
 	v.z = v.z / l
 
-	return l
+	return l, nil
 }
 
 func (v Vec3D) Directon() Vec3D {
