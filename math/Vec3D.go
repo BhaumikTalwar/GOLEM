@@ -153,8 +153,7 @@ func (v Vec3D) CosAngleBetween(vec Vec3D) (float64, error) {
 	return v.Dot(vec) / (lenM), nil
 }
 
-func (v *Vec3D) Rotate(axis Vec3D, theta float64) error {
-	qRot := QtFromAxisAngle(axis, theta)
+func (v *Vec3D) Rotate(qRot Quaternion) error {
 	_, err := qRot.Normalize()
 	if err != nil {
 		return err
@@ -180,8 +179,29 @@ func (v *Vec3D) Rotate(axis Vec3D, theta float64) error {
 	return nil
 }
 
-func (v Vec3D) RotateVec(axis Vec3D, theta float64) (Vec3D, error) {
-	err := v.Rotate(axis, theta)
+func (v Vec3D) RotateVec(qRot Quaternion) (Vec3D, error) {
+	err := v.Rotate(qRot)
+	if err != nil {
+		return Vec3D{}, err
+	}
+
+	return v, nil
+}
+
+func (v *Vec3D) RotateByEuler(e EulerAngle) error {
+	qRot := Quaternion{}
+	qRot.SetFromEulerAngles(e)
+
+	err := v.Rotate(qRot)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (v Vec3D) RotateVecByEuler(e EulerAngle) (Vec3D, error) {
+	err := v.RotateByEuler(e)
 	if err != nil {
 		return Vec3D{}, err
 	}

@@ -175,6 +175,7 @@ func (q Quaternion) ToAxisAngle() (Vec3D, float64, error) {
 	}
 
 	//TODO: To handle the edge case when q.w == 1 || q.w == -1
+	// Maybe I should normalize the angle here hmm will see
 
 	angle := 2 * math.Acos(q.w)
 	sinHF := math.Sqrt(1 - (q.w * q.w))
