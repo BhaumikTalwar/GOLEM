@@ -132,21 +132,34 @@ func (m Mat3D) TranposeMat() Mat3D {
 }
 
 func (m Mat3D) Det() float64 {
-	return (m[0][0] * m[1][1]) - (m[0][1] * m[1][0])
+	m1 := (m[1][1] * m[2][2]) - (m[2][1] * m[1][2])
+	m2 := (m[1][0] * m[2][2]) - (m[2][0] * m[1][2])
+	m3 := (m[1][0] * m[2][1]) - (m[2][0] * m[1][1])
+
+	return (m[0][0] * m1) - (m[0][1] * m2) + (m[0][2] * m3)
+}
+
+func (m Mat3D) AdjointMat() Mat3D {
+	adj := Mat3D{}
+
+	adj[0][0] = m[1][1]*m[2][2] - m[1][2]*m[2][1]
+	adj[0][1] = -(m[1][0]*m[2][2] - m[1][2]*m[2][0])
+	adj[0][2] = m[1][0]*m[2][1] - m[1][1]*m[2][0]
+
+	adj[1][0] = -(m[0][1]*m[2][2] - m[0][2]*m[2][1])
+	adj[1][1] = m[0][0]*m[2][2] - m[0][2]*m[2][0]
+	adj[1][2] = -(m[0][0]*m[2][1] - m[0][1]*m[2][0])
+
+	adj[2][0] = m[0][1]*m[1][2] - m[0][2]*m[1][1]
+	adj[2][1] = -(m[0][0]*m[1][2] - m[0][2]*m[1][0])
+	adj[2][2] = m[0][0]*m[1][1] - m[0][1]*m[1][0]
+
+	return adj
+
 }
 
 func (m *Mat3D) ToAdjoint() {
-	m[0][0], m[1][1] = m[1][1], m[0][0]
-
-	m[0][1] *= -1
-	m[1][0] *= -1
-}
-
-func (m *Mat3D) AdjointMat() Mat3D {
-	return Mat3D{
-		{m[1][1], -m[0][1]},
-		{-m[1][0], m[0][0]},
-	}
+	*m = m.AdjointMat()
 }
 
 func (m *Mat3D) Inverse() error {
@@ -169,9 +182,9 @@ func (m Mat3D) InverseMat() Mat3D {
 func (m Mat3D) Multiply(mat Mat3D) Mat3D {
 	out := Mat3D{}
 
-	for k := 0; k < 2; k++ {
-		for i := 0; i < 2; i++ {
-			for j := 0; j < 2; j++ {
+	for k := 0; k < 3; k++ {
+		for i := 0; i < 3; i++ {
+			for j := 0; j < 3; j++ {
 				out[i][j] += (m[i][k] * mat[k][j])
 			}
 		}
@@ -181,10 +194,12 @@ func (m Mat3D) Multiply(mat Mat3D) Mat3D {
 }
 
 func (m *Mat3D) IsEqual(mat Mat3D) bool {
-	return m[0][0] == mat[0][0] && m[0][1] == mat[0][1] &&
-		m[1][0] == mat[1][0] && m[1][1] == mat[1][1]
+	return (m[0][0] == mat[0][0] && m[0][1] == mat[0][1] && m[0][2] == mat[0][2] &&
+		m[1][0] == mat[1][0] && m[1][1] == mat[1][1] && m[1][2] == mat[1][2] &&
+		m[2][0] == mat[2][0] && m[2][1] == mat[2][1] && m[2][2] == mat[2][2])
+
 }
 
 func (m *Mat3D) Trace() float64 {
-	return m[0][0] + m[1][1]
+	return m[0][0] + m[1][1] + m[2][2]
 }
