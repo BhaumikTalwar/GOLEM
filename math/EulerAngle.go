@@ -20,10 +20,12 @@ func (e *EulerAngle) SetZero() {
 	e.yaw = 0
 }
 
-func (e *EulerAngle) ToDegrees() {
+func (e EulerAngle) ToDegrees() (float64, float64, float64) {
 	e.roll *= (180 / math.Pi)
 	e.pitch *= (180 / math.Pi)
 	e.yaw *= (180 / math.Pi)
+
+	return e.roll, e.pitch, e.yaw
 }
 
 // for [-Pi , Pi ]

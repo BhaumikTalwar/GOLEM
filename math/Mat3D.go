@@ -200,6 +200,13 @@ func (m *Mat3D) IsEqual(mat Mat3D) bool {
 
 }
 
+func (m *Mat3D) IsIdentity() bool {
+	return (m[0][0] == 1 && m[0][1] == 0 && m[0][2] == 0 &&
+		m[1][0] == 0 && m[1][1] == 1 && m[1][2] == 0 &&
+		m[2][0] == 0 && m[2][1] == 0 && m[2][2] == 1)
+
+}
+
 func (m *Mat3D) Trace() float64 {
 	return m[0][0] + m[1][1] + m[2][2]
 }

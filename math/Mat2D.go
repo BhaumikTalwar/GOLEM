@@ -136,6 +136,12 @@ func (m *Mat2D) IsEqual(mat Mat2D) bool {
 		m[1][0] == mat[1][0] && m[1][1] == mat[1][1]
 }
 
+func (m *Mat2D) IsIdentity() bool {
+	return (m[0][0] == 1 && m[0][1] == 0 &&
+		m[1][0] == 0 && m[1][1] == 1)
+
+}
+
 func (m *Mat2D) Trace() float64 {
 	return m[0][0] + m[1][1]
 }
