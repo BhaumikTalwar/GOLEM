@@ -2,11 +2,6 @@ package math
 
 import "errors"
 
-var (
-	ErrZeroDet    = errors.New("Determinat is Zero")
-	ErrInvalidLen = errors.New("Invalid Len Slice")
-)
-
 type Mat2D [2][2]float64
 
 func (m *Mat2D) Set(mat [][]float64) error {

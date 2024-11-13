@@ -1,6 +1,14 @@
 package math
 
-import "math"
+import (
+	"errors"
+	"math"
+)
+
+var (
+	ErrZeroDet    = errors.New("Determinat is Zero")
+	ErrInvalidLen = errors.New("Invalid Len Slice")
+)
 
 func ToDegrees(angleRad float64) float64 {
 	return angleRad * (180 / math.Pi)

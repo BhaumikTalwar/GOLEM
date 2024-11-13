@@ -5,6 +5,11 @@ import (
 	"math"
 )
 
+var (
+	ZeroMagERR    = errors.New("Magnitude Is Zero")
+	InSigAngleERR = errors.New("Insignificant Angle For Rotation")
+)
+
 type Quaternion struct {
 	w, x, y, z float64
 }
@@ -44,8 +49,8 @@ func (q *Quaternion) SetFromEulerAngles(e EulerAngle) {
 	q.z = (cosR * cosP * sinY) - (sinR * sinP * cosY)
 }
 
+// Creates a Pure Quarternion from a Vec3d
 func (q *Quaternion) SetFromVec3D(v Vec3D) {
-	//Creates a Pure Quarternion from a Vec3d
 	q.w = 0
 	q.x = v.x
 	q.y = v.y
@@ -60,8 +65,8 @@ func (q *Quaternion) Add(qt Quaternion) {
 	q.z += qt.z
 }
 
+// returns a new Quaternions after addition
 func (q Quaternion) AddQt(qt Quaternion) Quaternion {
-	// returns a new Quaternions after addition
 	q.w += qt.w
 	q.x += qt.x
 	q.y += qt.y
@@ -81,11 +86,11 @@ func (q Quaternion) Magnitude() float64 {
 	return math.Sqrt((q.w * q.w) + (q.x * q.x) + (q.y * q.y) + (q.z * q.z))
 }
 
+// returns the initial magnitude after normalizing
 func (q *Quaternion) Normalize() (float64, error) {
-	//returns the initial magnitude after normalizing
 	m := q.Magnitude()
 	if m == 0 {
-		return -1, errors.New("Magnitude is Zero")
+		return -1, ZeroMagERR
 	}
 
 	q.w = q.w / m
@@ -96,9 +101,13 @@ func (q *Quaternion) Normalize() (float64, error) {
 	return m, nil
 }
 
-func (q Quaternion) Direction() Quaternion {
-	q.Normalize()
-	return q
+func (q Quaternion) Direction() (Quaternion, error) {
+	_, err := q.Normalize()
+	if err != nil {
+		return Quaternion{}, err
+	}
+
+	return q, nil
 }
 
 func (q *Quaternion) Negate() {
@@ -127,7 +136,7 @@ func (q Quaternion) ConjugateQt() Quaternion {
 func (q *Quaternion) Inverse() error {
 	magSq := q.Dot(*q)
 	if magSq == 0 {
-		return errors.New("Magnitude Is Zero")
+		return ZeroMagERR
 	}
 
 	q.Conjugate()
@@ -139,7 +148,7 @@ func (q *Quaternion) Inverse() error {
 func (q Quaternion) InverseQt() (Quaternion, error) {
 	magSq := q.Dot(q)
 	if magSq == 0 {
-		return Quaternion{}, errors.New("Magnitude Is Zero")
+		return Quaternion{}, ZeroMagERR
 	}
 
 	q.Conjugate()
@@ -153,19 +162,41 @@ func (q *Quaternion) Dot(qt Quaternion) float64 {
 }
 
 func (q *Quaternion) Multiply(qt Quaternion) {
-	q.w = q.w*qt.w - q.x*qt.x - q.y*qt.y - q.z*qt.z
-	q.x = q.w*qt.x + q.x*qt.w + q.y*qt.z - q.z*qt.y
-	q.y = q.w*qt.y - q.x*qt.z + q.y*qt.w + q.z*qt.x
-	q.z = q.w*qt.z + q.x*qt.y - q.y*qt.x + q.z*qt.w
+	w, x, y, z := q.w, q.x, q.y, q.z
+
+	q.w = w*qt.w - x*qt.x - y*qt.y - z*qt.z
+	q.x = w*qt.x + x*qt.w + y*qt.z - z*qt.y
+	q.y = w*qt.y - x*qt.z + y*qt.w + z*qt.x
+	q.z = w*qt.z + x*qt.y - y*qt.x + z*qt.w
 }
 
-func (q Quaternion) MultiplyQt(qt Quaternion) Quaternion {
-	q.w = q.w*qt.w - q.x*qt.x - q.y*qt.y - q.z*qt.z
-	q.x = q.w*qt.x + q.x*qt.w + q.y*qt.z - q.z*qt.y
-	q.y = q.w*qt.y - q.x*qt.z + q.y*qt.w + q.z*qt.x
-	q.z = q.w*qt.z + q.x*qt.y - q.y*qt.x + q.z*qt.w
+func (q *Quaternion) MultiplyQt(qt Quaternion) Quaternion {
+	return Quaternion{
+		w: q.w*qt.w - q.x*qt.x - q.y*qt.y - q.z*qt.z,
+		x: q.w*qt.x + q.x*qt.w + q.y*qt.z - q.z*qt.y,
+		y: q.w*qt.y - q.x*qt.z + q.y*qt.w + q.z*qt.x,
+		z: q.w*qt.z + q.x*qt.y - q.y*qt.x + q.z*qt.w,
+	}
 
-	return q
+}
+
+func (q Quaternion) RotateVec(vec Vec3D) (Vec3D, error) {
+	p := Quaternion{0, vec.x, vec.y, vec.z}
+
+	_, err := q.Normalize()
+	if err != nil {
+		return vec, err
+	}
+
+	qInv, err := q.InverseQt()
+	if err != nil {
+		return vec, err
+	}
+
+	q.Multiply(p)
+	q.Multiply(qInv)
+
+	return Vec3D{q.x, q.y, q.z}, nil
 }
 
 func (q Quaternion) ToAxisAngle() (Vec3D, float64, error) {
@@ -182,7 +213,7 @@ func (q Quaternion) ToAxisAngle() (Vec3D, float64, error) {
 
 	if angle < 1e-10 {
 		// returns the arbitary axis of rotation
-		return Vec3D{1, 0, 0}, 0, errors.New("Angle Of Rotation Insignificant")
+		return Vec3D{1, 0, 0}, 0, InSigAngleERR
 	}
 
 	axis := Vec3D{
@@ -214,4 +245,12 @@ func (q Quaternion) ToEulerAngles() EulerAngle {
 	e.yaw = math.Atan2(2*(q.w*q.z+q.x*q.y), 1-2*(q.y*q.y+q.z*q.z))
 
 	return e
+}
+
+func (q *Quaternion) IsZero() bool {
+	return q.w == 0 && q.x == 0 && q.y == 0 && q.z == 0
+}
+
+func (q *Quaternion) IsEqual(qt Quaternion) bool {
+	return q.w == qt.w && q.x == qt.x && q.y == qt.y && q.z == qt.z
 }
