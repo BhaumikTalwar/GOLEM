@@ -203,6 +203,46 @@ func (r *RotMat3D) EulerAngles() (EulerAngle, error) {
 	return e, nil
 }
 
+func (r RotMat3D) ToQuaternion() Quaternion {
+	q := Quaternion{}
+
+	if t := r.Trace(); t > 0 {
+		s := math.Sqrt(t+1) * 2
+
+		q.w = 0.25 * s
+		q.x = (r.Mat3D[2][1] - r.Mat3D[1][2]) / s
+		q.y = (r.Mat3D[0][2] - r.Mat3D[2][0]) / s
+		q.z = (r.Mat3D[1][0] - r.Mat3D[0][1]) / s
+
+	} else if r.Mat3D[0][0] > r.Mat3D[1][1] && r.Mat3D[0][0] > r.Mat3D[2][2] {
+		s := math.Sqrt(1.0+r.Mat3D[0][0]-r.Mat3D[1][1]-r.Mat3D[2][2]) * 2
+
+		q.w = (r.Mat3D[2][1] - r.Mat3D[1][2]) / s
+		q.x = 0.25 * s
+		q.y = (r.Mat3D[0][1] + r.Mat3D[1][0]) / s
+		q.z = (r.Mat3D[0][2] + r.Mat3D[2][0]) / s
+
+	} else if r.Mat3D[1][1] > r.Mat3D[2][2] {
+		s := math.Sqrt(1.0+r.Mat3D[1][1]-r.Mat3D[0][0]-r.Mat3D[2][2]) * 2
+
+		q.w = (r.Mat3D[0][2] - r.Mat3D[2][0]) / s
+		q.x = (r.Mat3D[0][1] + r.Mat3D[1][0]) / s
+		q.y = 0.25 * s
+		q.z = (r.Mat3D[1][2] + r.Mat3D[2][1]) / s
+
+	} else {
+		s := math.Sqrt(1.0+r.Mat3D[2][2]-r.Mat3D[0][0]-r.Mat3D[1][1]) * 2
+
+		q.w = (r.Mat3D[1][0] - r.Mat3D[0][1]) / s
+		q.x = (r.Mat3D[0][2] + r.Mat3D[2][0]) / s
+		q.y = (r.Mat3D[1][2] + r.Mat3D[2][1]) / s
+		q.z = 0.25 * s
+
+	}
+
+	return q
+}
+
 func (r RotMat3D) RotateVec2D(vec Vec2D) Vec2D {
 	return Vec2D{
 		x: (vec.x * r.Mat3D[0][0]) + (vec.y * r.Mat3D[0][1]),
