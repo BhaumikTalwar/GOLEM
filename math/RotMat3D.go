@@ -27,6 +27,8 @@ func RotMatX(angle float64) RotMat3D {
 	r.Mat3D[2][1] = sin
 	r.Mat3D[2][2] = cos
 
+	r.order = "X"
+
 	return r
 }
 
@@ -46,6 +48,8 @@ func RotMatY(angle float64) RotMat3D {
 	r.Mat3D[2][1] = 0
 	r.Mat3D[2][2] = cos
 
+	r.order = "Y"
+
 	return r
 }
 
@@ -64,6 +68,8 @@ func RotMatZ(angle float64) RotMat3D {
 	r.Mat3D[2][0] = 0
 	r.Mat3D[2][1] = 0
 	r.Mat3D[2][2] = 1
+
+	r.order = "Z"
 
 	return r
 }
@@ -98,12 +104,103 @@ func (r *RotMat3D) SetRot(order string, roll, pitch, yaw float64) error {
 	return nil
 }
 
-func (r RotMat3D) EulerAngle() float64 {
-	return math.Atan2(r.Mat3D[1][0], r.Mat3D[0][0])
+func (r *RotMat3D) MultiplyRotMat(rmat RotMat3D) error {
+	if len(r.order) >= 3 {
+		errors.New("Cannot Have More than 3 axis")
+	}
+
+	if len(rmat.order) != 1 {
+		errors.New("Invalid Operation: May result in inconsistent Result")
+	}
+
+	if strings.Contains(r.order, rmat.order) {
+		return errors.New("Cant Repeat Rotation")
+	}
+
+	r.Multiply(rmat.Mat3D)
+	r.order += rmat.order
+
+	return nil
 }
 
-func (r RotMat3D) EulerAngleDeg() float64 {
-	return ToDegrees(math.Atan2(r.Mat3D[1][0], r.Mat3D[0][0]))
+func (r *RotMat3D) Clear() {
+	r.SetIdentity()
+	r.order = ""
+}
+
+func (r *RotMat3D) EulerAngles() (EulerAngle, error) {
+	e := EulerAngle{}
+
+	if len(r.order) != 3 || !strings.Contains(r.order, "X") || !strings.Contains(r.order, "Y") || !strings.Contains(r.order, "Z") {
+		return e, errors.New("unsupported rotation order: must include 'X', 'Y', and 'Z'")
+	}
+
+	switch r.order {
+	case "XYZ":
+		e.pitch = math.Asin(-r.Mat3D[2][0])
+		if math.Abs(r.Mat3D[2][0]) < 0.99999 {
+			e.roll = math.Atan2(r.Mat3D[2][1], r.Mat3D[2][2])
+			e.yaw = math.Atan2(r.Mat3D[1][0], r.Mat3D[0][0])
+		} else {
+			e.yaw = 0
+			e.roll = math.Atan2(-r.Mat3D[1][2], r.Mat3D[1][1])
+		}
+
+	case "XZY":
+		e.pitch = math.Asin(r.Mat3D[1][0])
+		if math.Abs(r.Mat3D[1][0]) < 0.99999 {
+			e.roll = math.Atan2(-r.Mat3D[1][2], r.Mat3D[1][1])
+			e.yaw = math.Atan2(-r.Mat3D[2][0], r.Mat3D[0][0])
+		} else {
+			e.yaw = 0
+			e.roll = math.Atan2(r.Mat3D[2][1], r.Mat3D[2][2])
+		}
+
+	case "YXZ":
+		e.pitch = math.Asin(r.Mat3D[2][1])
+		if math.Abs(r.Mat3D[2][1]) < 0.99999 {
+			e.roll = math.Atan2(-r.Mat3D[2][0], r.Mat3D[2][2])
+			e.yaw = math.Atan2(-r.Mat3D[0][1], r.Mat3D[1][1])
+		} else {
+			e.yaw = 0
+			e.roll = math.Atan2(r.Mat3D[0][2], r.Mat3D[0][0])
+		}
+
+	case "YZX":
+		e.pitch = math.Asin(-r.Mat3D[0][1])
+		if math.Abs(r.Mat3D[0][1]) < 0.99999 {
+			e.roll = math.Atan2(r.Mat3D[2][1], r.Mat3D[1][1])
+			e.yaw = math.Atan2(r.Mat3D[0][2], r.Mat3D[0][0])
+		} else {
+			e.yaw = 0
+			e.roll = math.Atan2(-r.Mat3D[2][0], r.Mat3D[2][2])
+		}
+
+	case "ZXY":
+		e.pitch = math.Asin(-r.Mat3D[1][2])
+		if math.Abs(r.Mat3D[1][2]) < 0.99999 {
+			e.roll = math.Atan2(r.Mat3D[1][0], r.Mat3D[1][1])
+			e.yaw = math.Atan2(r.Mat3D[0][2], r.Mat3D[2][2])
+		} else {
+			e.yaw = 0
+			e.roll = math.Atan2(-r.Mat3D[0][1], r.Mat3D[0][0])
+		}
+
+	case "ZYX":
+		e.pitch = math.Asin(-r.Mat3D[0][2])
+		if math.Abs(r.Mat3D[0][2]) < 0.99999 {
+			e.roll = math.Atan2(r.Mat3D[1][2], r.Mat3D[2][2])
+			e.yaw = math.Atan2(r.Mat3D[0][1], r.Mat3D[0][0])
+		} else {
+			e.yaw = 0
+			e.roll = math.Atan2(-r.Mat3D[1][0], r.Mat3D[1][1])
+		}
+
+	default:
+		return e, errors.New("unsupported rotation order")
+	}
+
+	return e, nil
 }
 
 func (r RotMat3D) RotateVec2D(vec Vec2D) Vec2D {
