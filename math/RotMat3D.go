@@ -243,16 +243,36 @@ func (r RotMat3D) ToQuaternion() Quaternion {
 	return q
 }
 
-func (r RotMat3D) RotateVec2D(vec Vec2D) Vec2D {
-	return Vec2D{
-		x: (vec.x * r.Mat3D[0][0]) + (vec.y * r.Mat3D[0][1]),
-		y: (vec.x * r.Mat3D[1][0]) + (vec.y * r.Mat3D[1][1]),
+func (r RotMat3D) ToAxisAngle() AxisAngle {
+	out := AxisAngle{}
+	out.angle = math.Acos((r.Trace() - 1) / 2)
+
+	if math.Abs(out.angle) < 1e-6 {
+		out.axis = Vec3D{x: 1, y: 0, z: 0}
+
+	} else {
+		sin := math.Sin(out.angle)
+		out.axis = Vec3D{
+			x: (r.Mat3D[2][1] - r.Mat3D[1][2]) / (2 * sin),
+			y: (r.Mat3D[0][2] - r.Mat3D[2][0]) / (2 * sin),
+			z: (r.Mat3D[1][0] - r.Mat3D[0][1]) / (2 * sin),
+		}
+	}
+
+	return out
+}
+
+func (r RotMat3D) RotateVec3D(vec Vec3D) Vec3D {
+	return Vec3D{
+		x: (vec.x * r.Mat3D[0][0]) + (vec.y * r.Mat3D[0][1]) + (vec.z * r.Mat3D[0][2]),
+		y: (vec.x * r.Mat3D[1][0]) + (vec.y * r.Mat3D[1][1]) + (vec.z * r.Mat3D[1][2]),
+		z: (vec.x * r.Mat3D[2][0]) + (vec.y * r.Mat3D[2][1]) + (vec.z * r.Mat3D[2][2]),
 	}
 }
 
-func (r RotMat3D) RotateArndPoint(vec, center Vec2D) Vec2D {
+func (r RotMat3D) RotateArndPoint(vec, center Vec3D) Vec3D {
 	vec.Sub(center)
-	vec = r.RotateVec2D(vec)
+	vec = r.RotateVec3D(vec)
 	vec.Add(center)
 
 	return vec
@@ -260,10 +280,29 @@ func (r RotMat3D) RotateArndPoint(vec, center Vec2D) Vec2D {
 
 func (r *RotMat3D) ReflectX() {
 	r.Mat3D[1][1] *= -1
+	r.Mat3D[2][2] *= -1
 }
 
 func (r *RotMat3D) ReflectY() {
 	r.Mat3D[0][0] *= -1
+	r.Mat3D[2][2] *= -1
+}
+
+func (r *RotMat3D) ReflectZ() {
+	r.Mat3D[0][0] *= -1
+	r.Mat3D[1][1] *= -1
+}
+
+func (r *RotMat3D) ReflectXY() {
+	r.Mat3D[2][2] *= -1
+}
+
+func (r *RotMat3D) ReflectYZ() {
+	r.Mat3D[0][0] *= -1
+}
+
+func (r *RotMat3D) ReflectXZ() {
+	r.Mat3D[1][1] *= -1
 }
 
 func (r RotMat3D) SlerpR(target RotMat3D, t float64) RotMat3D {

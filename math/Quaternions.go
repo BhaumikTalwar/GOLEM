@@ -28,14 +28,14 @@ func (q *Quaternion) SetZero() {
 	q.z = 0.0
 }
 
-func (q *Quaternion) SetFromAxisAngle(axis Vec3D, theta float64) {
-	axis.Normalize()
-	sinHF, cosHF := math.Sincos(theta / 2)
+func (q *Quaternion) SetFromAxisAngle(a AxisAngle) {
+	a.axis.Normalize()
+	sinHF, cosHF := math.Sincos(a.angle / 2)
 
 	q.w = cosHF
-	q.x = axis.x * sinHF
-	q.y = axis.y * sinHF
-	q.z = axis.z * sinHF
+	q.x = a.axis.x * sinHF
+	q.y = a.axis.y * sinHF
+	q.z = a.axis.z * sinHF
 }
 
 func (q *Quaternion) SetFromEulerAngles(e EulerAngle) {
@@ -199,10 +199,10 @@ func (q Quaternion) RotateVec(vec Vec3D) (Vec3D, error) {
 	return Vec3D{q.x, q.y, q.z}, nil
 }
 
-func (q Quaternion) ToAxisAngle() (Vec3D, float64, error) {
+func (q Quaternion) ToAxisAngle() (AxisAngle, error) {
 	_, err := q.Normalize()
 	if err != nil {
-		return Vec3D{}, -1, err
+		return AxisAngle{}, err
 	}
 
 	//TODO: To handle the edge case when q.w == 1 || q.w == -1
@@ -213,7 +213,9 @@ func (q Quaternion) ToAxisAngle() (Vec3D, float64, error) {
 
 	if angle < 1e-10 {
 		// returns the arbitary axis of rotation
-		return Vec3D{1, 0, 0}, 0, InSigAngleERR
+		return AxisAngle{
+			axis:  Vec3D{1, 0, 0},
+			angle: 0}, InSigAngleERR
 	}
 
 	axis := Vec3D{
@@ -224,10 +226,10 @@ func (q Quaternion) ToAxisAngle() (Vec3D, float64, error) {
 
 	_, err = axis.Normalize()
 	if err != nil {
-		return Vec3D{}, angle, err
+		return AxisAngle{angle: angle}, err
 	}
 
-	return axis, angle, nil
+	return AxisAngle{axis: axis, angle: angle}, nil
 }
 
 func (q Quaternion) ToEulerAngles() EulerAngle {
