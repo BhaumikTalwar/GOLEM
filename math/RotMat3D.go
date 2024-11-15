@@ -134,7 +134,7 @@ func (r *RotMat3D) Clear() {
 	r.order = ""
 }
 
-func (r *RotMat3D) EulerAngles() (EulerAngle, error) {
+func (r *RotMat3D) ToEulerAngles() (EulerAngle, error) {
 	e := EulerAngle{}
 
 	if len(r.order) != 3 || !strings.Contains(r.order, "X") || !strings.Contains(r.order, "Y") || !strings.Contains(r.order, "Z") {
@@ -313,13 +313,5 @@ func (r *RotMat3D) ReflectXZ() {
 }
 
 func (r RotMat3D) SlerpR(target RotMat3D, t float64) RotMat3D {
-	angle := r.EulerAngle()
-	targetAngle := target.EulerAngle()
 
-	interpolatedAngle := NormalizeAngle(angle + t*(targetAngle-angle))
-
-	out := RotMat3D{}
-	out.Set(interpolatedAngle)
-
-	return out
 }
