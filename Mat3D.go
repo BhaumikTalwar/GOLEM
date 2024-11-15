@@ -1,4 +1,4 @@
-package math
+package GOLEM
 
 type Mat3D [3][3]float64
 
