@@ -7,6 +7,18 @@ type AxisAngle struct {
 	angle float64
 }
 
+func NewAxisAngle(axis Vec3D, angle float64) (AxisAngle, error) {
+	_, err := axis.Normalize()
+	if err != nil {
+		return AxisAngle{}, err
+	}
+
+	return AxisAngle{
+		axis:  axis,
+		angle: angle,
+	}, nil
+}
+
 func (a *AxisAngle) Set(axis Vec3D, angle float64) {
 	a.axis = axis
 	a.angle = angle

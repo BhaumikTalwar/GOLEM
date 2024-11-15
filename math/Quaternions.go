@@ -95,8 +95,8 @@ func (q *Quaternion) SetFromVec3D(v Vec3D) {
 	q.z = v.z
 }
 
+// Add qt to q
 func (q *Quaternion) Add(qt Quaternion) {
-	// Add qt to q
 	q.w += qt.w
 	q.x += qt.x
 	q.y += qt.y
@@ -113,11 +113,38 @@ func (q Quaternion) AddQt(qt Quaternion) Quaternion {
 	return q
 }
 
+// Sub qt from q => q - qt
+func (q *Quaternion) Sub(qt Quaternion) {
+	q.w -= qt.w
+	q.x -= qt.x
+	q.y -= qt.y
+	q.z -= qt.z
+}
+
+// returns a new Quaternions after Subtraction
+func (q Quaternion) SubQt(qt Quaternion) Quaternion {
+	q.w -= qt.w
+	q.x -= qt.x
+	q.y -= qt.y
+	q.z -= qt.z
+
+	return q
+}
+
 func (q *Quaternion) ScaleBy(fac float64) {
 	q.w *= fac
 	q.x *= fac
 	q.y *= fac
 	q.z *= fac
+}
+
+func (q Quaternion) ScaleByQt(fac float64) Quaternion {
+	q.w *= fac
+	q.x *= fac
+	q.y *= fac
+	q.z *= fac
+
+	return q
 }
 
 func (q Quaternion) Magnitude() float64 {
@@ -304,4 +331,59 @@ func (q *Quaternion) IsZero() bool {
 
 func (q *Quaternion) IsEqual(qt Quaternion) bool {
 	return q.w == qt.w && q.x == qt.x && q.y == qt.y && q.z == qt.z
+}
+
+func (q Quaternion) SlerpQt(qt Quaternion, t float64) (Quaternion, error) {
+	if t < 0 || t > 1 {
+		return Quaternion{}, errors.New("Invalid t Value")
+	}
+
+	dot := q.Dot(qt)
+
+	if dot < 0 {
+		qt.Negate()
+		dot = -dot
+	}
+
+	if dot > 0.9995 {
+		return q.LerpQt(qt, t)
+	}
+
+	theta := math.Acos(dot)
+	sin := math.Sin(theta)
+
+	s1 := math.Sin(((1 - t) * theta)) / sin
+	s2 := math.Sin((t * theta)) / sin
+
+	result := Quaternion{
+		w: (s1 * q.w) + (s2 * qt.w),
+		x: (s1 * q.x) + (s2 * qt.x),
+		y: (s1 * q.y) + (s2 * qt.y),
+		z: (s1 * q.z) + (s2 * qt.z),
+	}
+
+	if _, err := result.Normalize(); err != nil {
+		return Quaternion{}, errors.New("Cant Normalize the Result")
+	}
+
+	return result, nil
+}
+
+func (q Quaternion) LerpQt(qt Quaternion, t float64) (Quaternion, error) {
+	if t < 0 || t > 1 {
+		return Quaternion{}, errors.New("Invalid t Value")
+	}
+
+	result := Quaternion{
+		w: (1-t)*q.w + t*qt.w,
+		x: (1-t)*q.x + t*qt.x,
+		y: (1-t)*q.y + t*qt.y,
+		z: (1-t)*q.z + t*qt.z,
+	}
+
+	if _, err := result.Normalize(); err != nil {
+		return Quaternion{}, errors.New("Cant Normalize the Result")
+	}
+
+	return result, nil
 }
