@@ -313,5 +313,8 @@ func (r *RotMat3D) ReflectXZ() {
 }
 
 func (r RotMat3D) SlerpR(target RotMat3D, t float64) RotMat3D {
+	q := r.ToQuaternion()
+	q.Slerp(target.ToQuaternion(), t)
 
+	return q.ToRotMat3D()
 }

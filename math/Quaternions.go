@@ -318,9 +318,21 @@ func (q Quaternion) ToRotMat3D() RotMat3D {
 	return RotMat3D{
 		order: QtSet,
 		Mat3D: Mat3D{
-			{1 - (2 * ((q.y * q.y) + (q.z * q.z))), 2 * ((q.x * q.y) - (q.z * q.w)), 2 * ((q.x * q.z) + (q.y * q.w))},
-			{2 * ((q.x * q.y) + (q.z * q.w)), 1 - (2 * ((q.x * q.x) + (q.z * q.z))), 2 * ((q.y * q.z) - (q.w * q.x))},
-			{2 * ((q.x * q.z) - (q.w * q.y)), 2 * ((q.y * q.z) + (q.w * q.x)), 1 - (2 * ((q.x * q.x) + (q.y * q.y)))},
+			{
+				1 - (2 * ((q.y * q.y) + (q.z * q.z))),
+				2 * ((q.x * q.y) - (q.z * q.w)),
+				2 * ((q.x * q.z) + (q.y * q.w)),
+			},
+			{
+				2 * ((q.x * q.y) + (q.z * q.w)),
+				1 - (2 * ((q.x * q.x) + (q.z * q.z))),
+				2 * ((q.y * q.z) - (q.w * q.x)),
+			},
+			{
+				2 * ((q.x * q.z) - (q.w * q.y)),
+				2 * ((q.y * q.z) + (q.w * q.x)),
+				1 - (2 * ((q.x * q.x) + (q.y * q.y))),
+			},
 		},
 	}
 }
@@ -331,6 +343,17 @@ func (q *Quaternion) IsZero() bool {
 
 func (q *Quaternion) IsEqual(qt Quaternion) bool {
 	return q.w == qt.w && q.x == qt.x && q.y == qt.y && q.z == qt.z
+}
+
+func (q *Quaternion) Slerp(qt Quaternion, t float64) error {
+	result, err := q.SlerpQt(qt, t)
+	if err != nil {
+		return err
+	}
+
+	*q = result
+
+	return nil
 }
 
 func (q Quaternion) SlerpQt(qt Quaternion, t float64) (Quaternion, error) {
@@ -367,6 +390,17 @@ func (q Quaternion) SlerpQt(qt Quaternion, t float64) (Quaternion, error) {
 	}
 
 	return result, nil
+}
+
+func (q *Quaternion) Lerp(qt Quaternion, t float64) error {
+	result, err := q.LerpQt(qt, t)
+	if err != nil {
+		return err
+	}
+
+	*q = result
+
+	return nil
 }
 
 func (q Quaternion) LerpQt(qt Quaternion, t float64) (Quaternion, error) {
