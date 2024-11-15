@@ -6,6 +6,10 @@ import (
 	"strings"
 )
 
+const (
+	QtSet = "SET" // For RotMat3D formed by Quaternion as there is no order associated there
+)
+
 type RotMat3D struct {
 	Mat3D
 	order string
@@ -104,6 +108,8 @@ func (r *RotMat3D) SetRot(order string, roll, pitch, yaw float64) error {
 	return nil
 }
 
+// For Creating RotMat from inidividual RotMat's of a particular Axis
+// For casual multiplication use Mat3D.Multiply
 func (r *RotMat3D) MultiplyRotMat(rmat RotMat3D) error {
 	if len(r.order) >= 3 {
 		errors.New("Cannot Have More than 3 axis")
@@ -203,6 +209,7 @@ func (r *RotMat3D) EulerAngles() (EulerAngle, error) {
 	return e, nil
 }
 
+// Trace Method Or Shephard's Method
 func (r RotMat3D) ToQuaternion() Quaternion {
 	q := Quaternion{}
 

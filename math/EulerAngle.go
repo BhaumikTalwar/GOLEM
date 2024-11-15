@@ -28,14 +28,14 @@ func (e EulerAngle) ToDegrees() (float64, float64, float64) {
 	return e.roll, e.pitch, e.yaw
 }
 
-// for [-Pi , Pi ]
+// for [ -Pi , Pi ]
 func (e *EulerAngle) Normalize() {
 	e.roll = NormalizeAngle(e.roll)
 	e.pitch = NormalizeAngle(e.pitch)
 	e.yaw = NormalizeAngle(e.yaw)
 }
 
-// for [-Pi , Pi ]"
+// for [ 0 , Pi ]"
 func (e *EulerAngle) NormalizeTo2Pi() {
 	e.roll = NormalizeAngleTo2Pi(e.roll)
 	e.pitch = NormalizeAngleTo2Pi(e.pitch)
@@ -53,4 +53,24 @@ func (e EulerAngle) ToQuaternion() Quaternion {
 		y: (cosR * sinP * cosY) + (sinR * cosP * sinY),
 		z: (cosR * cosP * sinY) - (sinR * sinP * cosY),
 	}
+}
+
+func (e EulerAngle) ToRotMat3D(order string) (RotMat3D, error) {
+	out := RotMat3D{}
+
+	err := out.SetRot(order, e.roll, e.pitch, e.yaw)
+	if err != nil {
+		return out, err
+	}
+
+	return out, nil
+}
+
+func (e EulerAngle) ToAxisAngle(order string) (AxisAngle, error) {
+	rmat, err := e.ToRotMat3D(order)
+	if err != nil {
+		return AxisAngle{}, err
+	}
+
+	return rmat.ToAxisAngle(), nil
 }

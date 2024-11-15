@@ -18,8 +18,8 @@ func ToRadians(angleDeg float64) float64 {
 	return angleDeg * (math.Pi / 180)
 }
 
+// for nomalizing to [-Pi, Pi]
 func NormalizeAngle(angle float64) float64 {
-	// for nomalizing to [-Pi, Pi]
 	angle = math.Mod(angle, 2*math.Pi)
 
 	if angle > math.Pi {
@@ -31,8 +31,8 @@ func NormalizeAngle(angle float64) float64 {
 	return angle
 }
 
+// for Normalizing angle to [0, 2*Pi]
 func NormalizeAngleTo2Pi(angle float64) float64 {
-	// for Normalizing angle to [0, 2*Pi]
 	angle = math.Mod(angle, (2 * math.Pi))
 
 	if angle < 0 {

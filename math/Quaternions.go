@@ -49,6 +49,44 @@ func (q *Quaternion) SetFromEulerAngles(e EulerAngle) {
 	q.z = (cosR * cosP * sinY) - (sinR * sinP * cosY)
 }
 
+// Trace Method Or Shephard's Method
+func (q *Quaternion) SetFromRotMat3D(r RotMat3D) {
+
+	if t := r.Trace(); t > 0 {
+		s := math.Sqrt(t+1) * 2
+
+		q.w = 0.25 * s
+		q.x = (r.Mat3D[2][1] - r.Mat3D[1][2]) / s
+		q.y = (r.Mat3D[0][2] - r.Mat3D[2][0]) / s
+		q.z = (r.Mat3D[1][0] - r.Mat3D[0][1]) / s
+
+	} else if r.Mat3D[0][0] > r.Mat3D[1][1] && r.Mat3D[0][0] > r.Mat3D[2][2] {
+		s := math.Sqrt(1.0+r.Mat3D[0][0]-r.Mat3D[1][1]-r.Mat3D[2][2]) * 2
+
+		q.w = (r.Mat3D[2][1] - r.Mat3D[1][2]) / s
+		q.x = 0.25 * s
+		q.y = (r.Mat3D[0][1] + r.Mat3D[1][0]) / s
+		q.z = (r.Mat3D[0][2] + r.Mat3D[2][0]) / s
+
+	} else if r.Mat3D[1][1] > r.Mat3D[2][2] {
+		s := math.Sqrt(1.0+r.Mat3D[1][1]-r.Mat3D[0][0]-r.Mat3D[2][2]) * 2
+
+		q.w = (r.Mat3D[0][2] - r.Mat3D[2][0]) / s
+		q.x = (r.Mat3D[0][1] + r.Mat3D[1][0]) / s
+		q.y = 0.25 * s
+		q.z = (r.Mat3D[1][2] + r.Mat3D[2][1]) / s
+
+	} else {
+		s := math.Sqrt(1.0+r.Mat3D[2][2]-r.Mat3D[0][0]-r.Mat3D[1][1]) * 2
+
+		q.w = (r.Mat3D[1][0] - r.Mat3D[0][1]) / s
+		q.x = (r.Mat3D[0][2] + r.Mat3D[2][0]) / s
+		q.y = (r.Mat3D[1][2] + r.Mat3D[2][1]) / s
+		q.z = 0.25 * s
+
+	}
+}
+
 // Creates a Pure Quarternion from a Vec3d
 func (q *Quaternion) SetFromVec3D(v Vec3D) {
 	q.w = 0
@@ -247,6 +285,17 @@ func (q Quaternion) ToEulerAngles() EulerAngle {
 	e.yaw = math.Atan2(2*(q.w*q.z+q.x*q.y), 1-2*(q.y*q.y+q.z*q.z))
 
 	return e
+}
+
+func (q Quaternion) ToRotMat3D() RotMat3D {
+	return RotMat3D{
+		order: QtSet,
+		Mat3D: Mat3D{
+			{1 - (2 * ((q.y * q.y) + (q.z * q.z))), 2 * ((q.x * q.y) - (q.z * q.w)), 2 * ((q.x * q.z) + (q.y * q.w))},
+			{2 * ((q.x * q.y) + (q.z * q.w)), 1 - (2 * ((q.x * q.x) + (q.z * q.z))), 2 * ((q.y * q.z) - (q.w * q.x))},
+			{2 * ((q.x * q.z) - (q.w * q.y)), 2 * ((q.y * q.z) + (q.w * q.x)), 1 - (2 * ((q.x * q.x) + (q.y * q.y)))},
+		},
+	}
 }
 
 func (q *Quaternion) IsZero() bool {
