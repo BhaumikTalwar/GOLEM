@@ -223,3 +223,31 @@ func PerspectiveProjection(point Vec3D, focalLen float64) Vec3D {
 		z: 0,
 	}
 }
+
+func (v Vec3D) LerpV(vec Vec3D, t float64) (Vec3D, error) {
+	if t < 0 || t > 1 {
+		return Vec3D{}, ErrInvalidInterPolParam
+	}
+
+	return Vec3D{
+		x: v.x + (t * (vec.x - v.x)),
+		y: v.y + (t * (vec.y - v.y)),
+		z: v.z + (t * (vec.z - v.z)),
+	}, nil
+}
+
+func (v *Vec3D) Lerp(vec Vec3D, t float64) error {
+	if t < 0 || t > 1 {
+		return ErrInvalidInterPolParam
+	}
+
+	v.x = v.x + (t * (vec.x - v.x))
+	v.y = v.y + (t * (vec.y - v.y))
+	v.z = v.z + (t * (vec.z - v.z))
+
+	return nil
+}
+
+func (v Vec3D) SlerpV(vec Vec3D, t float64) (Vec3D, error) {
+
+}

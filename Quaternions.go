@@ -356,6 +356,14 @@ func (q Quaternion) SlerpQt(qt Quaternion, t float64) (Quaternion, error) {
 		return Quaternion{}, ErrInvalidInterPolParam
 	}
 
+	if _, err := q.Normalize(); err != nil {
+		return Quaternion{}, ErrNormalizeError
+	}
+
+	if _, err := qt.Normalize(); err != nil {
+		return Quaternion{}, ErrNormalizeError
+	}
+
 	dot := q.Dot(qt)
 
 	if dot < 0 {
@@ -401,6 +409,14 @@ func (q *Quaternion) Lerp(qt Quaternion, t float64) error {
 func (q Quaternion) LerpQt(qt Quaternion, t float64) (Quaternion, error) {
 	if t < 0 || t > 1 {
 		return Quaternion{}, ErrInvalidInterPolParam
+	}
+
+	if _, err := q.Normalize(); err != nil {
+		return Quaternion{}, ErrNormalizeError
+	}
+
+	if _, err := qt.Normalize(); err != nil {
+		return Quaternion{}, ErrNormalizeError
 	}
 
 	result := Quaternion{

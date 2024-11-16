@@ -168,3 +168,26 @@ func (v Vec2D) RightPerpendicular() Vec2D {
 		y: -1 * v.x,
 	}
 }
+
+func (v Vec2D) LerpV(vec Vec2D, t float64) (Vec2D, error) {
+	if t < 0 || t > 1 {
+		return Vec2D{}, ErrInvalidInterPolParam
+	}
+
+	return Vec2D{
+		x: v.x + (t * (vec.x - v.x)),
+		y: v.y + (t * (vec.y - v.y)),
+	}, nil
+}
+
+func (v *Vec2D) Lerp(vec Vec2D, t float64) error {
+
+	if t < 0 || t > 1 {
+		return ErrInvalidInterPolParam
+	}
+
+	v.x = v.x + (t * (vec.x - v.x))
+	v.y = v.y + (t * (vec.y - v.y))
+
+	return nil
+}
