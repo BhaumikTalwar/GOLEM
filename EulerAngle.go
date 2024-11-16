@@ -3,62 +3,62 @@ package golem
 import "math"
 
 type EulerAngle struct {
-	roll  float64
-	pitch float64
-	yaw   float64
+	Roll  float64
+	Pitch float64
+	Yaw   float64
 }
 
 func (e *EulerAngle) Set(roll, pitch, yaw float64) {
-	e.roll = roll
-	e.pitch = pitch
-	e.yaw = yaw
+	e.Roll = roll
+	e.Pitch = pitch
+	e.Yaw = yaw
 }
 
 func (e *EulerAngle) SetZero() {
-	e.roll = 0
-	e.pitch = 0
-	e.yaw = 0
+	e.Roll = 0
+	e.Pitch = 0
+	e.Yaw = 0
 }
 
 func (e EulerAngle) ToDegrees() (float64, float64, float64) {
-	e.roll *= (180 / math.Pi)
-	e.pitch *= (180 / math.Pi)
-	e.yaw *= (180 / math.Pi)
+	e.Roll *= (180 / math.Pi)
+	e.Pitch *= (180 / math.Pi)
+	e.Yaw *= (180 / math.Pi)
 
-	return e.roll, e.pitch, e.yaw
+	return e.Roll, e.Pitch, e.Yaw
 }
 
 // for [ -Pi , Pi ]
 func (e *EulerAngle) Normalize() {
-	e.roll = NormalizeAngle(e.roll)
-	e.pitch = NormalizeAngle(e.pitch)
-	e.yaw = NormalizeAngle(e.yaw)
+	e.Roll = NormalizeAngle(e.Roll)
+	e.Pitch = NormalizeAngle(e.Pitch)
+	e.Yaw = NormalizeAngle(e.Yaw)
 }
 
 // for [ 0 , Pi ]"
 func (e *EulerAngle) NormalizeTo2Pi() {
-	e.roll = NormalizeAngleTo2Pi(e.roll)
-	e.pitch = NormalizeAngleTo2Pi(e.pitch)
-	e.yaw = NormalizeAngleTo2Pi(e.yaw)
+	e.Roll = NormalizeAngleTo2Pi(e.Roll)
+	e.Pitch = NormalizeAngleTo2Pi(e.Pitch)
+	e.Yaw = NormalizeAngleTo2Pi(e.Yaw)
 }
 
 func (e EulerAngle) ToQuaternion() Quaternion {
-	cosR, sinR := math.Sincos(e.roll / 2)
-	cosP, sinP := math.Sincos(e.pitch / 2)
-	cosY, sinY := math.Sincos(e.yaw / 2)
+	cosR, sinR := math.Sincos(e.Roll / 2)
+	cosP, sinP := math.Sincos(e.Pitch / 2)
+	cosY, sinY := math.Sincos(e.Yaw / 2)
 
 	return Quaternion{
-		w: (cosR * cosP * cosY) + (sinR * sinP * sinY),
-		x: (sinR * cosP * cosY) - (cosR * sinP * sinY),
-		y: (cosR * sinP * cosY) + (sinR * cosP * sinY),
-		z: (cosR * cosP * sinY) - (sinR * sinP * cosY),
+		W: (cosR * cosP * cosY) + (sinR * sinP * sinY),
+		X: (sinR * cosP * cosY) - (cosR * sinP * sinY),
+		Y: (cosR * sinP * cosY) + (sinR * cosP * sinY),
+		Z: (cosR * cosP * sinY) - (sinR * sinP * cosY),
 	}
 }
 
 func (e EulerAngle) ToRotMat3D(order string) (RotMat3D, error) {
 	out := RotMat3D{}
 
-	err := out.SetRot(order, e.roll, e.pitch, e.yaw)
+	err := out.SetRot(order, e.Roll, e.Pitch, e.Yaw)
 	if err != nil {
 		return out, err
 	}

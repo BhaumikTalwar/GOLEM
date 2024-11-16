@@ -65,10 +65,10 @@ func (m Mat2D) ScaleMat(fac float64) Mat2D {
 }
 
 func (m *Mat2D) ScaleByVec2D(vec Vec2D) {
-	m[0][0] *= vec.x
-	m[0][1] *= vec.y
-	m[1][0] *= vec.x
-	m[1][1] *= vec.y
+	m[0][0] *= vec.X
+	m[0][1] *= vec.Y
+	m[1][0] *= vec.X
+	m[1][1] *= vec.Y
 }
 
 func (m *Mat2D) Transpose() {

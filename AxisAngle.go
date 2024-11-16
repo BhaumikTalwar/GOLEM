@@ -3,8 +3,8 @@ package golem
 import "math"
 
 type AxisAngle struct {
-	axis  Vec3D
-	angle float64
+	Axis  Vec3D
+	Angle float64
 }
 
 func NewAxisAngle(axis Vec3D, angle float64) (AxisAngle, error) {
@@ -14,37 +14,37 @@ func NewAxisAngle(axis Vec3D, angle float64) (AxisAngle, error) {
 	}
 
 	return AxisAngle{
-		axis:  axis,
-		angle: angle,
+		Axis:  axis,
+		Angle: angle,
 	}, nil
 }
 
 func (a *AxisAngle) Set(axis Vec3D, angle float64) {
-	a.axis = axis
-	a.angle = angle
+	a.Axis = axis
+	a.Angle = angle
 }
 
 func (a *AxisAngle) SetAxis(axis Vec3D) {
-	a.axis = axis
+	a.Axis = axis
 }
 
 func (a *AxisAngle) SetAngle(angle float64) {
-	a.angle = angle
+	a.Angle = angle
 }
 
 func (a *AxisAngle) SetAxisX(angle float64) {
-	a.axis = Vec3D{x: 1, y: 0, z: 0}
-	a.angle = angle
+	a.Axis = Vec3D{X: 1, Y: 0, Z: 0}
+	a.Angle = angle
 }
 
 func (a *AxisAngle) SetAxisY(angle float64) {
-	a.axis = Vec3D{x: 0, y: 1, z: 0}
-	a.angle = angle
+	a.Axis = Vec3D{X: 0, Y: 1, Z: 0}
+	a.Angle = angle
 }
 
 func (a *AxisAngle) SetAxisZ(angle float64) {
-	a.axis = Vec3D{x: 0, y: 0, z: 1}
-	a.angle = angle
+	a.Axis = Vec3D{X: 0, Y: 0, Z: 1}
+	a.Angle = angle
 }
 
 func (a *AxisAngle) SetFromRotMat3D(r RotMat3D) {
@@ -72,23 +72,23 @@ func (a *AxisAngle) SetFromEulerAngle(e EulerAngle, order string) error {
 }
 
 func (a AxisAngle) ToQuaternion() (Quaternion, error) {
-	_, err := a.axis.Normalize()
+	_, err := a.Axis.Normalize()
 	if err != nil {
 		return Quaternion{}, err
 	}
 
-	sinHF, cosHF := math.Sincos(a.angle / 2)
+	sinHF, cosHF := math.Sincos(a.Angle / 2)
 
 	return Quaternion{
-		w: cosHF,
-		x: a.axis.x * sinHF,
-		y: a.axis.y * sinHF,
-		z: a.axis.z * sinHF,
+		W: cosHF,
+		X: a.Axis.X * sinHF,
+		Y: a.Axis.Y * sinHF,
+		Z: a.Axis.Z * sinHF,
 	}, nil
 }
 
 func (a AxisAngle) ToRotMat3D() (RotMat3D, error) {
-	_, err := a.axis.Normalize()
+	_, err := a.Axis.Normalize()
 	if err != nil {
 		return RotMat3D{
 			Mat3D: Mat3D{
@@ -99,26 +99,26 @@ func (a AxisAngle) ToRotMat3D() (RotMat3D, error) {
 		}, err
 	}
 
-	cos := math.Cos(a.angle)
-	sin := math.Sin(a.angle)
+	cos := math.Cos(a.Angle)
+	sin := math.Sin(a.Angle)
 	cosm1 := 1 - cos
 
 	return RotMat3D{
 		Mat3D: Mat3D{
 			{
-				cos + (a.axis.x * a.axis.x * cosm1),
-				(a.axis.x * a.axis.y * cosm1) - (a.axis.z * sin),
-				(a.axis.x * a.axis.z * cosm1) + (a.axis.y * sin),
+				cos + (a.Axis.X * a.Axis.X * cosm1),
+				(a.Axis.X * a.Axis.Y * cosm1) - (a.Axis.Z * sin),
+				(a.Axis.X * a.Axis.Z * cosm1) + (a.Axis.Y * sin),
 			},
 			{
-				(a.axis.y * a.axis.x * cosm1) + (a.axis.z * sin),
-				cos + (a.axis.y * a.axis.y * cosm1),
-				(a.axis.y * a.axis.z * cosm1) - (a.axis.x * sin),
+				(a.Axis.Y * a.Axis.X * cosm1) + (a.Axis.Z * sin),
+				cos + (a.Axis.Y * a.Axis.Y * cosm1),
+				(a.Axis.Y * a.Axis.Z * cosm1) - (a.Axis.X * sin),
 			},
 			{
-				(a.axis.z * a.axis.x * cosm1) - (a.axis.y * sin),
-				(a.axis.z * a.axis.y * cosm1) + (a.axis.x * sin),
-				cos + (a.axis.z * a.axis.z * cosm1),
+				(a.Axis.Z * a.Axis.X * cosm1) - (a.Axis.Y * sin),
+				(a.Axis.Z * a.Axis.Y * cosm1) + (a.Axis.X * sin),
+				cos + (a.Axis.Z * a.Axis.Z * cosm1),
 			},
 		},
 	}, nil

@@ -5,42 +5,42 @@ import (
 )
 
 type Quaternion struct {
-	w, x, y, z float64
+	W, X, Y, Z float64
 }
 
 func (q *Quaternion) Set(w, x, y, z float64) {
-	q.w = w
-	q.x = x
-	q.y = y
-	q.z = z
+	q.W = w
+	q.X = x
+	q.Y = y
+	q.Z = z
 }
 
 func (q *Quaternion) SetZero() {
-	q.w = 0.0
-	q.x = 0.0
-	q.y = 0.0
-	q.z = 0.0
+	q.W = 0.0
+	q.X = 0.0
+	q.Y = 0.0
+	q.Z = 0.0
 }
 
 func (q *Quaternion) SetFromAxisAngle(a AxisAngle) {
-	a.axis.Normalize()
-	sinHF, cosHF := math.Sincos(a.angle / 2)
+	a.Axis.Normalize()
+	sinHF, cosHF := math.Sincos(a.Angle / 2)
 
-	q.w = cosHF
-	q.x = a.axis.x * sinHF
-	q.y = a.axis.y * sinHF
-	q.z = a.axis.z * sinHF
+	q.W = cosHF
+	q.X = a.Axis.X * sinHF
+	q.Y = a.Axis.Y * sinHF
+	q.Z = a.Axis.Z * sinHF
 }
 
 func (q *Quaternion) SetFromEulerAngles(e EulerAngle) {
-	cosR, sinR := math.Sincos(e.roll / 2)
-	cosP, sinP := math.Sincos(e.pitch / 2)
-	cosY, sinY := math.Sincos(e.yaw / 2)
+	cosR, sinR := math.Sincos(e.Roll / 2)
+	cosP, sinP := math.Sincos(e.Pitch / 2)
+	cosY, sinY := math.Sincos(e.Yaw / 2)
 
-	q.w = (cosR * cosP * cosY) + (sinR * sinP * sinY)
-	q.x = (sinR * cosP * cosY) - (cosR * sinP * sinY)
-	q.y = (cosR * sinP * cosY) + (sinR * cosP * sinY)
-	q.z = (cosR * cosP * sinY) - (sinR * sinP * cosY)
+	q.W = (cosR * cosP * cosY) + (sinR * sinP * sinY)
+	q.X = (sinR * cosP * cosY) - (cosR * sinP * sinY)
+	q.Y = (cosR * sinP * cosY) + (sinR * cosP * sinY)
+	q.Z = (cosR * cosP * sinY) - (sinR * sinP * cosY)
 }
 
 // Trace Method Or Shephard's Method
@@ -49,100 +49,100 @@ func (q *Quaternion) SetFromRotMat3D(r RotMat3D) {
 	if t := r.Trace(); t > 0 {
 		s := math.Sqrt(t+1) * 2
 
-		q.w = 0.25 * s
-		q.x = (r.Mat3D[2][1] - r.Mat3D[1][2]) / s
-		q.y = (r.Mat3D[0][2] - r.Mat3D[2][0]) / s
-		q.z = (r.Mat3D[1][0] - r.Mat3D[0][1]) / s
+		q.W = 0.25 * s
+		q.X = (r.Mat3D[2][1] - r.Mat3D[1][2]) / s
+		q.Y = (r.Mat3D[0][2] - r.Mat3D[2][0]) / s
+		q.Z = (r.Mat3D[1][0] - r.Mat3D[0][1]) / s
 
 	} else if r.Mat3D[0][0] > r.Mat3D[1][1] && r.Mat3D[0][0] > r.Mat3D[2][2] {
 		s := math.Sqrt(1.0+r.Mat3D[0][0]-r.Mat3D[1][1]-r.Mat3D[2][2]) * 2
 
-		q.w = (r.Mat3D[2][1] - r.Mat3D[1][2]) / s
-		q.x = 0.25 * s
-		q.y = (r.Mat3D[0][1] + r.Mat3D[1][0]) / s
-		q.z = (r.Mat3D[0][2] + r.Mat3D[2][0]) / s
+		q.W = (r.Mat3D[2][1] - r.Mat3D[1][2]) / s
+		q.X = 0.25 * s
+		q.Y = (r.Mat3D[0][1] + r.Mat3D[1][0]) / s
+		q.Z = (r.Mat3D[0][2] + r.Mat3D[2][0]) / s
 
 	} else if r.Mat3D[1][1] > r.Mat3D[2][2] {
 		s := math.Sqrt(1.0+r.Mat3D[1][1]-r.Mat3D[0][0]-r.Mat3D[2][2]) * 2
 
-		q.w = (r.Mat3D[0][2] - r.Mat3D[2][0]) / s
-		q.x = (r.Mat3D[0][1] + r.Mat3D[1][0]) / s
-		q.y = 0.25 * s
-		q.z = (r.Mat3D[1][2] + r.Mat3D[2][1]) / s
+		q.W = (r.Mat3D[0][2] - r.Mat3D[2][0]) / s
+		q.X = (r.Mat3D[0][1] + r.Mat3D[1][0]) / s
+		q.Y = 0.25 * s
+		q.Z = (r.Mat3D[1][2] + r.Mat3D[2][1]) / s
 
 	} else {
 		s := math.Sqrt(1.0+r.Mat3D[2][2]-r.Mat3D[0][0]-r.Mat3D[1][1]) * 2
 
-		q.w = (r.Mat3D[1][0] - r.Mat3D[0][1]) / s
-		q.x = (r.Mat3D[0][2] + r.Mat3D[2][0]) / s
-		q.y = (r.Mat3D[1][2] + r.Mat3D[2][1]) / s
-		q.z = 0.25 * s
+		q.W = (r.Mat3D[1][0] - r.Mat3D[0][1]) / s
+		q.X = (r.Mat3D[0][2] + r.Mat3D[2][0]) / s
+		q.Y = (r.Mat3D[1][2] + r.Mat3D[2][1]) / s
+		q.Z = 0.25 * s
 
 	}
 }
 
 // Creates a Pure Quarternion from a Vec3d
 func (q *Quaternion) SetFromVec3D(v Vec3D) {
-	q.w = 0
-	q.x = v.x
-	q.y = v.y
-	q.z = v.z
+	q.W = 0
+	q.X = v.X
+	q.Y = v.Y
+	q.Z = v.Z
 }
 
 // Add qt to q
 func (q *Quaternion) Add(qt Quaternion) {
-	q.w += qt.w
-	q.x += qt.x
-	q.y += qt.y
-	q.z += qt.z
+	q.W += qt.W
+	q.X += qt.X
+	q.Y += qt.Y
+	q.Z += qt.Z
 }
 
 // returns a new Quaternions after addition
 func (q Quaternion) AddQt(qt Quaternion) Quaternion {
-	q.w += qt.w
-	q.x += qt.x
-	q.y += qt.y
-	q.z += qt.z
+	q.W += qt.W
+	q.X += qt.X
+	q.Y += qt.Y
+	q.Z += qt.Z
 
 	return q
 }
 
 // Sub qt from q => q - qt
 func (q *Quaternion) Sub(qt Quaternion) {
-	q.w -= qt.w
-	q.x -= qt.x
-	q.y -= qt.y
-	q.z -= qt.z
+	q.W -= qt.W
+	q.X -= qt.X
+	q.Y -= qt.Y
+	q.Z -= qt.Z
 }
 
 // returns a new Quaternions after Subtraction
 func (q Quaternion) SubQt(qt Quaternion) Quaternion {
-	q.w -= qt.w
-	q.x -= qt.x
-	q.y -= qt.y
-	q.z -= qt.z
+	q.W -= qt.W
+	q.X -= qt.X
+	q.Y -= qt.Y
+	q.Z -= qt.Z
 
 	return q
 }
 
 func (q *Quaternion) ScaleBy(fac float64) {
-	q.w *= fac
-	q.x *= fac
-	q.y *= fac
-	q.z *= fac
+	q.W *= fac
+	q.X *= fac
+	q.Y *= fac
+	q.Z *= fac
 }
 
 func (q Quaternion) ScaleByQt(fac float64) Quaternion {
-	q.w *= fac
-	q.x *= fac
-	q.y *= fac
-	q.z *= fac
+	q.W *= fac
+	q.X *= fac
+	q.Y *= fac
+	q.Z *= fac
 
 	return q
 }
 
 func (q Quaternion) Magnitude() float64 {
-	return math.Sqrt((q.w * q.w) + (q.x * q.x) + (q.y * q.y) + (q.z * q.z))
+	return math.Sqrt((q.W * q.W) + (q.X * q.X) + (q.Y * q.Y) + (q.Z * q.Z))
 }
 
 // returns the initial magnitude after normalizing
@@ -152,10 +152,10 @@ func (q *Quaternion) Normalize() (float64, error) {
 		return -1, ErrZeroMag
 	}
 
-	q.w = q.w / m
-	q.x = q.x / m
-	q.y = q.y / m
-	q.z = q.z / m
+	q.W = q.W / m
+	q.X = q.X / m
+	q.Y = q.Y / m
+	q.Z = q.Z / m
 
 	return m, nil
 }
@@ -170,10 +170,10 @@ func (q Quaternion) Direction() (Quaternion, error) {
 }
 
 func (q *Quaternion) Negate() {
-	q.w *= -1
-	q.x *= -1
-	q.y *= -1
-	q.z *= -1
+	q.W *= -1
+	q.X *= -1
+	q.Y *= -1
+	q.Z *= -1
 }
 
 func (q Quaternion) NegateQt() Quaternion {
@@ -182,9 +182,9 @@ func (q Quaternion) NegateQt() Quaternion {
 }
 
 func (q *Quaternion) Conjugate() {
-	q.x *= -1
-	q.y *= -1
-	q.z *= -1
+	q.X *= -1
+	q.Y *= -1
+	q.Z *= -1
 }
 
 func (q Quaternion) ConjugateQt() Quaternion {
@@ -217,30 +217,30 @@ func (q Quaternion) InverseQt() (Quaternion, error) {
 }
 
 func (q *Quaternion) Dot(qt Quaternion) float64 {
-	return (q.x * qt.x) + (q.y * qt.y) + (q.z * qt.z)
+	return (q.X * qt.X) + (q.Y * qt.Y) + (q.Z * qt.Z)
 }
 
 func (q *Quaternion) Multiply(qt Quaternion) {
-	w, x, y, z := q.w, q.x, q.y, q.z
+	w, x, y, z := q.W, q.X, q.Y, q.Z
 
-	q.w = w*qt.w - x*qt.x - y*qt.y - z*qt.z
-	q.x = w*qt.x + x*qt.w + y*qt.z - z*qt.y
-	q.y = w*qt.y - x*qt.z + y*qt.w + z*qt.x
-	q.z = w*qt.z + x*qt.y - y*qt.x + z*qt.w
+	q.W = w*qt.W - x*qt.X - y*qt.Y - z*qt.Z
+	q.X = w*qt.X + x*qt.W + y*qt.Z - z*qt.Y
+	q.Y = w*qt.Y - x*qt.Z + y*qt.W + z*qt.X
+	q.Z = w*qt.Z + x*qt.Y - y*qt.X + z*qt.W
 }
 
 func (q *Quaternion) MultiplyQt(qt Quaternion) Quaternion {
 	return Quaternion{
-		w: q.w*qt.w - q.x*qt.x - q.y*qt.y - q.z*qt.z,
-		x: q.w*qt.x + q.x*qt.w + q.y*qt.z - q.z*qt.y,
-		y: q.w*qt.y - q.x*qt.z + q.y*qt.w + q.z*qt.x,
-		z: q.w*qt.z + q.x*qt.y - q.y*qt.x + q.z*qt.w,
+		W: q.W*qt.W - q.X*qt.X - q.Y*qt.Y - q.Z*qt.Z,
+		X: q.W*qt.X + q.X*qt.W + q.Y*qt.Z - q.Z*qt.Y,
+		Y: q.W*qt.Y - q.X*qt.Z + q.Y*qt.W + q.Z*qt.X,
+		Z: q.W*qt.Z + q.X*qt.Y - q.Y*qt.X + q.Z*qt.W,
 	}
 
 }
 
 func (q Quaternion) RotateVec(vec Vec3D) (Vec3D, error) {
-	p := Quaternion{0, vec.x, vec.y, vec.z}
+	p := Quaternion{0, vec.X, vec.Y, vec.Z}
 
 	_, err := q.Normalize()
 	if err != nil {
@@ -255,7 +255,7 @@ func (q Quaternion) RotateVec(vec Vec3D) (Vec3D, error) {
 	q.Multiply(p)
 	q.Multiply(qInv)
 
-	return Vec3D{q.x, q.y, q.z}, nil
+	return Vec3D{q.X, q.Y, q.Z}, nil
 }
 
 func (q Quaternion) ToAxisAngle() (AxisAngle, error) {
@@ -267,76 +267,76 @@ func (q Quaternion) ToAxisAngle() (AxisAngle, error) {
 	//TODO: To handle the edge case when q.w == 1 || q.w == -1
 	// Maybe I should normalize the angle here hmm will see
 
-	angle := 2 * math.Acos(q.w)
-	sinHF := math.Sqrt(1 - (q.w * q.w))
+	angle := 2 * math.Acos(q.W)
+	sinHF := math.Sqrt(1 - (q.W * q.W))
 
 	if angle < 1e-10 {
 		// returns the arbitary axis of rotation
 		return AxisAngle{
-			axis:  Vec3D{1, 0, 0},
-			angle: 0}, ErrInSigAngle
+			Axis:  Vec3D{1, 0, 0},
+			Angle: 0}, ErrInSigAngle
 	}
 
 	axis := Vec3D{
-		x: q.x / sinHF,
-		y: q.y / sinHF,
-		z: q.z / sinHF,
+		X: q.X / sinHF,
+		Y: q.Y / sinHF,
+		Z: q.Z / sinHF,
 	}
 
 	_, err = axis.Normalize()
 	if err != nil {
-		return AxisAngle{angle: angle}, err
+		return AxisAngle{Angle: angle}, err
 	}
 
-	return AxisAngle{axis: axis, angle: angle}, nil
+	return AxisAngle{Axis: axis, Angle: angle}, nil
 }
 
 func (q Quaternion) ToEulerAngles() EulerAngle {
 	e := EulerAngle{}
 
-	e.roll = math.Atan2(2*((q.w*q.x)+(q.y*q.z)), 1-(2*((q.x*q.x)+(q.y*q.y))))
+	e.Roll = math.Atan2(2*((q.W*q.X)+(q.Y*q.Z)), 1-(2*((q.X*q.X)+(q.Y*q.Y))))
 
-	sinp := 2 * (q.w*q.y - q.z*q.x)
+	sinp := 2 * (q.W*q.Y - q.Z*q.X)
 	if math.Abs(sinp) >= 1 {
-		e.pitch = math.Copysign(math.Pi/2, sinp)
+		e.Pitch = math.Copysign(math.Pi/2, sinp)
 	} else {
-		e.pitch = math.Asin(sinp)
+		e.Pitch = math.Asin(sinp)
 	}
 
-	e.yaw = math.Atan2(2*(q.w*q.z+q.x*q.y), 1-2*(q.y*q.y+q.z*q.z))
+	e.Yaw = math.Atan2(2*(q.W*q.Z+q.X*q.Y), 1-2*(q.Y*q.Y+q.Z*q.Z))
 
 	return e
 }
 
 func (q Quaternion) ToRotMat3D() RotMat3D {
 	return RotMat3D{
-		order: QtSet,
+		Order: QtSet,
 		Mat3D: Mat3D{
 			{
-				1 - (2 * ((q.y * q.y) + (q.z * q.z))),
-				2 * ((q.x * q.y) - (q.z * q.w)),
-				2 * ((q.x * q.z) + (q.y * q.w)),
+				1 - (2 * ((q.Y * q.Y) + (q.Z * q.Z))),
+				2 * ((q.X * q.Y) - (q.Z * q.W)),
+				2 * ((q.X * q.Z) + (q.Y * q.W)),
 			},
 			{
-				2 * ((q.x * q.y) + (q.z * q.w)),
-				1 - (2 * ((q.x * q.x) + (q.z * q.z))),
-				2 * ((q.y * q.z) - (q.w * q.x)),
+				2 * ((q.X * q.Y) + (q.Z * q.W)),
+				1 - (2 * ((q.X * q.X) + (q.Z * q.Z))),
+				2 * ((q.Y * q.Z) - (q.W * q.X)),
 			},
 			{
-				2 * ((q.x * q.z) - (q.w * q.y)),
-				2 * ((q.y * q.z) + (q.w * q.x)),
-				1 - (2 * ((q.x * q.x) + (q.y * q.y))),
+				2 * ((q.X * q.Z) - (q.W * q.Y)),
+				2 * ((q.Y * q.Z) + (q.W * q.X)),
+				1 - (2 * ((q.X * q.X) + (q.Y * q.Y))),
 			},
 		},
 	}
 }
 
 func (q *Quaternion) IsZero() bool {
-	return q.w == 0 && q.x == 0 && q.y == 0 && q.z == 0
+	return q.W == 0 && q.X == 0 && q.Y == 0 && q.Z == 0
 }
 
 func (q *Quaternion) IsEqual(qt Quaternion) bool {
-	return q.w == qt.w && q.x == qt.x && q.y == qt.y && q.z == qt.z
+	return q.W == qt.W && q.X == qt.X && q.Y == qt.Y && q.Z == qt.Z
 }
 
 func (q *Quaternion) Slerp(qt Quaternion, t float64) error {
@@ -383,10 +383,10 @@ func (q Quaternion) SlerpQt(qt Quaternion, t float64) (Quaternion, error) {
 	s2 := math.Sin((t * theta)) / sin
 
 	result := Quaternion{
-		w: (s1 * q.w) + (s2 * qt.w),
-		x: (s1 * q.x) + (s2 * qt.x),
-		y: (s1 * q.y) + (s2 * qt.y),
-		z: (s1 * q.z) + (s2 * qt.z),
+		W: (s1 * q.W) + (s2 * qt.W),
+		X: (s1 * q.X) + (s2 * qt.X),
+		Y: (s1 * q.Y) + (s2 * qt.Y),
+		Z: (s1 * q.Z) + (s2 * qt.Z),
 	}
 
 	if _, err := result.Normalize(); err != nil {
@@ -421,10 +421,10 @@ func (q Quaternion) LerpQt(qt Quaternion, t float64) (Quaternion, error) {
 	}
 
 	result := Quaternion{
-		w: (1-t)*q.w + t*qt.w,
-		x: (1-t)*q.x + t*qt.x,
-		y: (1-t)*q.y + t*qt.y,
-		z: (1-t)*q.z + t*qt.z,
+		W: (1-t)*q.W + t*qt.W,
+		X: (1-t)*q.X + t*qt.X,
+		Y: (1-t)*q.Y + t*qt.Y,
+		Z: (1-t)*q.Z + t*qt.Z,
 	}
 
 	if _, err := result.Normalize(); err != nil {

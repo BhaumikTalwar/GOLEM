@@ -17,7 +17,7 @@ func (r *RotMat2D) Set(angle float64) {
 }
 
 func (r *RotMat2D) SetFrom2Vec(v1, v2 Vec2D) {
-	angle := NormalizeAngle(math.Atan2(v2.y, v2.x) - math.Atan2(v1.y, v1.x))
+	angle := NormalizeAngle(math.Atan2(v2.Y, v2.X) - math.Atan2(v1.Y, v1.X))
 	r.Set(angle)
 }
 
@@ -31,8 +31,8 @@ func (r RotMat2D) EulerAngleDeg() float64 {
 
 func (r RotMat2D) RotateVec2D(vec Vec2D) Vec2D {
 	return Vec2D{
-		x: (vec.x * r.Mat2D[0][0]) + (vec.y * r.Mat2D[0][1]),
-		y: (vec.x * r.Mat2D[1][0]) + (vec.y * r.Mat2D[1][1]),
+		X: (vec.X * r.Mat2D[0][0]) + (vec.Y * r.Mat2D[0][1]),
+		Y: (vec.X * r.Mat2D[1][0]) + (vec.Y * r.Mat2D[1][1]),
 	}
 }
 

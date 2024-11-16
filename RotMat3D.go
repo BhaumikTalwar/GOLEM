@@ -1,7 +1,6 @@
 package golem
 
 import (
-	"errors"
 	"math"
 	"strings"
 )
@@ -12,7 +11,7 @@ const (
 
 type RotMat3D struct {
 	Mat3D
-	order string
+	Order string
 }
 
 func RotMatX(angle float64) RotMat3D {
@@ -31,7 +30,7 @@ func RotMatX(angle float64) RotMat3D {
 	r.Mat3D[2][1] = sin
 	r.Mat3D[2][2] = cos
 
-	r.order = "X"
+	r.Order = "X"
 
 	return r
 }
@@ -52,7 +51,7 @@ func RotMatY(angle float64) RotMat3D {
 	r.Mat3D[2][1] = 0
 	r.Mat3D[2][2] = cos
 
-	r.order = "Y"
+	r.Order = "Y"
 
 	return r
 }
@@ -73,7 +72,7 @@ func RotMatZ(angle float64) RotMat3D {
 	r.Mat3D[2][1] = 0
 	r.Mat3D[2][2] = 1
 
-	r.order = "Z"
+	r.Order = "Z"
 
 	return r
 }
@@ -88,7 +87,7 @@ func (r *RotMat3D) SetRot(order string, roll, pitch, yaw float64) error {
 		return ErrInvalidOrderString
 	}
 
-	r.order = order
+	r.Order = order
 	r.SetIdentity()
 
 	for _, axis := range order {
@@ -111,95 +110,95 @@ func (r *RotMat3D) SetRot(order string, roll, pitch, yaw float64) error {
 // For Creating RotMat from inidividual RotMat's of a particular Axis
 // For casual multiplication use Mat3D.Multiply
 func (r *RotMat3D) MultiplyRotMat(rmat RotMat3D) error {
-	if len(r.order) >= 3 {
+	if len(r.Order) >= 3 {
 		return ErrMaxOrder
 	}
 
-	if len(rmat.order) != 1 {
+	if len(rmat.Order) != 1 {
 		return ErrInvalidOperation
 	}
 
-	if strings.Contains(r.order, rmat.order) {
+	if strings.Contains(r.Order, rmat.Order) {
 		return ErrRepeatRot
 	}
 
 	r.Multiply(rmat.Mat3D)
-	r.order += rmat.order
+	r.Order += rmat.Order
 
 	return nil
 }
 
 func (r *RotMat3D) Clear() {
 	r.SetIdentity()
-	r.order = ""
+	r.Order = ""
 }
 
 func (r *RotMat3D) ToEulerAngles() (EulerAngle, error) {
 	e := EulerAngle{}
 
-	if len(r.order) != 3 || !strings.Contains(r.order, "X") || !strings.Contains(r.order, "Y") || !strings.Contains(r.order, "Z") {
+	if len(r.Order) != 3 || !strings.Contains(r.Order, "X") || !strings.Contains(r.Order, "Y") || !strings.Contains(r.Order, "Z") {
 		return e, ErrUnsupportedRotOrder
 	}
 
-	switch r.order {
+	switch r.Order {
 	case "XYZ":
-		e.pitch = math.Asin(-r.Mat3D[2][0])
+		e.Pitch = math.Asin(-r.Mat3D[2][0])
 		if math.Abs(r.Mat3D[2][0]) < 0.99999 {
-			e.roll = math.Atan2(r.Mat3D[2][1], r.Mat3D[2][2])
-			e.yaw = math.Atan2(r.Mat3D[1][0], r.Mat3D[0][0])
+			e.Roll = math.Atan2(r.Mat3D[2][1], r.Mat3D[2][2])
+			e.Yaw = math.Atan2(r.Mat3D[1][0], r.Mat3D[0][0])
 		} else {
-			e.yaw = 0
-			e.roll = math.Atan2(-r.Mat3D[1][2], r.Mat3D[1][1])
+			e.Yaw = 0
+			e.Roll = math.Atan2(-r.Mat3D[1][2], r.Mat3D[1][1])
 		}
 
 	case "XZY":
-		e.pitch = math.Asin(r.Mat3D[1][0])
+		e.Pitch = math.Asin(r.Mat3D[1][0])
 		if math.Abs(r.Mat3D[1][0]) < 0.99999 {
-			e.roll = math.Atan2(-r.Mat3D[1][2], r.Mat3D[1][1])
-			e.yaw = math.Atan2(-r.Mat3D[2][0], r.Mat3D[0][0])
+			e.Roll = math.Atan2(-r.Mat3D[1][2], r.Mat3D[1][1])
+			e.Yaw = math.Atan2(-r.Mat3D[2][0], r.Mat3D[0][0])
 		} else {
-			e.yaw = 0
-			e.roll = math.Atan2(r.Mat3D[2][1], r.Mat3D[2][2])
+			e.Yaw = 0
+			e.Roll = math.Atan2(r.Mat3D[2][1], r.Mat3D[2][2])
 		}
 
 	case "YXZ":
-		e.pitch = math.Asin(r.Mat3D[2][1])
+		e.Pitch = math.Asin(r.Mat3D[2][1])
 		if math.Abs(r.Mat3D[2][1]) < 0.99999 {
-			e.roll = math.Atan2(-r.Mat3D[2][0], r.Mat3D[2][2])
-			e.yaw = math.Atan2(-r.Mat3D[0][1], r.Mat3D[1][1])
+			e.Roll = math.Atan2(-r.Mat3D[2][0], r.Mat3D[2][2])
+			e.Yaw = math.Atan2(-r.Mat3D[0][1], r.Mat3D[1][1])
 		} else {
-			e.yaw = 0
-			e.roll = math.Atan2(r.Mat3D[0][2], r.Mat3D[0][0])
+			e.Yaw = 0
+			e.Roll = math.Atan2(r.Mat3D[0][2], r.Mat3D[0][0])
 		}
 
 	case "YZX":
-		e.pitch = math.Asin(-r.Mat3D[0][1])
+		e.Pitch = math.Asin(-r.Mat3D[0][1])
 		if math.Abs(r.Mat3D[0][1]) < 0.99999 {
-			e.roll = math.Atan2(r.Mat3D[2][1], r.Mat3D[1][1])
-			e.yaw = math.Atan2(r.Mat3D[0][2], r.Mat3D[0][0])
+			e.Roll = math.Atan2(r.Mat3D[2][1], r.Mat3D[1][1])
+			e.Yaw = math.Atan2(r.Mat3D[0][2], r.Mat3D[0][0])
 		} else {
-			e.yaw = 0
-			e.roll = math.Atan2(-r.Mat3D[2][0], r.Mat3D[2][2])
+			e.Yaw = 0
+			e.Roll = math.Atan2(-r.Mat3D[2][0], r.Mat3D[2][2])
 		}
 
 	case "ZXY":
-		e.pitch = math.Asin(-r.Mat3D[1][2])
+		e.Pitch = math.Asin(-r.Mat3D[1][2])
 		if math.Abs(r.Mat3D[1][2]) < 0.99999 {
-			e.roll = math.Atan2(r.Mat3D[1][0], r.Mat3D[1][1])
-			e.yaw = math.Atan2(r.Mat3D[0][2], r.Mat3D[2][2])
+			e.Roll = math.Atan2(r.Mat3D[1][0], r.Mat3D[1][1])
+			e.Yaw = math.Atan2(r.Mat3D[0][2], r.Mat3D[2][2])
 		} else {
-			e.yaw = 0
-			e.roll = math.Atan2(-r.Mat3D[0][1], r.Mat3D[0][0])
+			e.Yaw = 0
+			e.Roll = math.Atan2(-r.Mat3D[0][1], r.Mat3D[0][0])
 		}
 
 	case "ZYX":
-		e.pitch = math.Asin(-r.Mat3D[0][2])
+		e.Pitch = math.Asin(-r.Mat3D[0][2])
 		if math.Abs(r.Mat3D[0][2]) < 0.99999 {
-			e.roll = math.Atan2(r.Mat3D[1][2], r.Mat3D[2][2])
-			e.yaw = math.Atan2(r.Mat3D[0][1], r.Mat3D[0][0])
+			e.Roll = math.Atan2(r.Mat3D[1][2], r.Mat3D[2][2])
+			e.Yaw = math.Atan2(r.Mat3D[0][1], r.Mat3D[0][0])
 		} else {
-			e.yaw = 0
-			e.roll = math.Atan2(-r.Mat3D[1][0], r.Mat3D[1][1])
+			e.Yaw = 0
+			e.Roll = math.Atan2(-r.Mat3D[1][0], r.Mat3D[1][1])
 		}
 
 	default:
@@ -216,34 +215,34 @@ func (r RotMat3D) ToQuaternion() Quaternion {
 	if t := r.Trace(); t > 0 {
 		s := math.Sqrt(t+1) * 2
 
-		q.w = 0.25 * s
-		q.x = (r.Mat3D[2][1] - r.Mat3D[1][2]) / s
-		q.y = (r.Mat3D[0][2] - r.Mat3D[2][0]) / s
-		q.z = (r.Mat3D[1][0] - r.Mat3D[0][1]) / s
+		q.W = 0.25 * s
+		q.X = (r.Mat3D[2][1] - r.Mat3D[1][2]) / s
+		q.Y = (r.Mat3D[0][2] - r.Mat3D[2][0]) / s
+		q.Z = (r.Mat3D[1][0] - r.Mat3D[0][1]) / s
 
 	} else if r.Mat3D[0][0] > r.Mat3D[1][1] && r.Mat3D[0][0] > r.Mat3D[2][2] {
 		s := math.Sqrt(1.0+r.Mat3D[0][0]-r.Mat3D[1][1]-r.Mat3D[2][2]) * 2
 
-		q.w = (r.Mat3D[2][1] - r.Mat3D[1][2]) / s
-		q.x = 0.25 * s
-		q.y = (r.Mat3D[0][1] + r.Mat3D[1][0]) / s
-		q.z = (r.Mat3D[0][2] + r.Mat3D[2][0]) / s
+		q.W = (r.Mat3D[2][1] - r.Mat3D[1][2]) / s
+		q.X = 0.25 * s
+		q.Y = (r.Mat3D[0][1] + r.Mat3D[1][0]) / s
+		q.Z = (r.Mat3D[0][2] + r.Mat3D[2][0]) / s
 
 	} else if r.Mat3D[1][1] > r.Mat3D[2][2] {
 		s := math.Sqrt(1.0+r.Mat3D[1][1]-r.Mat3D[0][0]-r.Mat3D[2][2]) * 2
 
-		q.w = (r.Mat3D[0][2] - r.Mat3D[2][0]) / s
-		q.x = (r.Mat3D[0][1] + r.Mat3D[1][0]) / s
-		q.y = 0.25 * s
-		q.z = (r.Mat3D[1][2] + r.Mat3D[2][1]) / s
+		q.W = (r.Mat3D[0][2] - r.Mat3D[2][0]) / s
+		q.X = (r.Mat3D[0][1] + r.Mat3D[1][0]) / s
+		q.Y = 0.25 * s
+		q.Z = (r.Mat3D[1][2] + r.Mat3D[2][1]) / s
 
 	} else {
 		s := math.Sqrt(1.0+r.Mat3D[2][2]-r.Mat3D[0][0]-r.Mat3D[1][1]) * 2
 
-		q.w = (r.Mat3D[1][0] - r.Mat3D[0][1]) / s
-		q.x = (r.Mat3D[0][2] + r.Mat3D[2][0]) / s
-		q.y = (r.Mat3D[1][2] + r.Mat3D[2][1]) / s
-		q.z = 0.25 * s
+		q.W = (r.Mat3D[1][0] - r.Mat3D[0][1]) / s
+		q.X = (r.Mat3D[0][2] + r.Mat3D[2][0]) / s
+		q.Y = (r.Mat3D[1][2] + r.Mat3D[2][1]) / s
+		q.Z = 0.25 * s
 
 	}
 
@@ -252,17 +251,17 @@ func (r RotMat3D) ToQuaternion() Quaternion {
 
 func (r RotMat3D) ToAxisAngle() AxisAngle {
 	out := AxisAngle{}
-	out.angle = math.Acos((r.Trace() - 1) / 2)
+	out.Angle = math.Acos((r.Trace() - 1) / 2)
 
-	if math.Abs(out.angle) < 1e-6 {
-		out.axis = Vec3D{x: 1, y: 0, z: 0}
+	if math.Abs(out.Angle) < 1e-6 {
+		out.Axis = Vec3D{X: 1, Y: 0, Z: 0}
 
 	} else {
-		sin := math.Sin(out.angle)
-		out.axis = Vec3D{
-			x: (r.Mat3D[2][1] - r.Mat3D[1][2]) / (2 * sin),
-			y: (r.Mat3D[0][2] - r.Mat3D[2][0]) / (2 * sin),
-			z: (r.Mat3D[1][0] - r.Mat3D[0][1]) / (2 * sin),
+		sin := math.Sin(out.Angle)
+		out.Axis = Vec3D{
+			X: (r.Mat3D[2][1] - r.Mat3D[1][2]) / (2 * sin),
+			Y: (r.Mat3D[0][2] - r.Mat3D[2][0]) / (2 * sin),
+			Z: (r.Mat3D[1][0] - r.Mat3D[0][1]) / (2 * sin),
 		}
 	}
 
@@ -271,9 +270,9 @@ func (r RotMat3D) ToAxisAngle() AxisAngle {
 
 func (r RotMat3D) RotateVec3D(vec Vec3D) Vec3D {
 	return Vec3D{
-		x: (vec.x * r.Mat3D[0][0]) + (vec.y * r.Mat3D[0][1]) + (vec.z * r.Mat3D[0][2]),
-		y: (vec.x * r.Mat3D[1][0]) + (vec.y * r.Mat3D[1][1]) + (vec.z * r.Mat3D[1][2]),
-		z: (vec.x * r.Mat3D[2][0]) + (vec.y * r.Mat3D[2][1]) + (vec.z * r.Mat3D[2][2]),
+		X: (vec.X * r.Mat3D[0][0]) + (vec.Y * r.Mat3D[0][1]) + (vec.Z * r.Mat3D[0][2]),
+		Y: (vec.X * r.Mat3D[1][0]) + (vec.Y * r.Mat3D[1][1]) + (vec.Z * r.Mat3D[1][2]),
+		Z: (vec.X * r.Mat3D[2][0]) + (vec.Y * r.Mat3D[2][1]) + (vec.Z * r.Mat3D[2][2]),
 	}
 }
 

@@ -107,17 +107,17 @@ func (m Mat3D) ScaleMat(fac float64) Mat3D {
 }
 
 func (m *Mat3D) ScaleByVec2D(vec Vec3D) {
-	m[0][0] *= vec.x
-	m[0][1] *= vec.y
-	m[0][2] *= vec.z
+	m[0][0] *= vec.X
+	m[0][1] *= vec.Y
+	m[0][2] *= vec.Z
 
-	m[1][0] *= vec.x
-	m[1][1] *= vec.y
-	m[1][2] *= vec.z
+	m[1][0] *= vec.X
+	m[1][1] *= vec.Y
+	m[1][2] *= vec.Z
 
-	m[2][0] *= vec.x
-	m[2][1] *= vec.y
-	m[2][2] *= vec.z
+	m[2][0] *= vec.X
+	m[2][1] *= vec.Y
+	m[2][2] *= vec.Z
 }
 
 func (m *Mat3D) Transpose() {

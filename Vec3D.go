@@ -5,27 +5,27 @@ import (
 )
 
 type Vec3D struct {
-	x float64
-	y float64
-	z float64
+	X float64
+	Y float64
+	Z float64
 }
 
 func (v *Vec3D) Set(x, y, z float64) {
-	v.x = x
-	v.y = y
-	v.z = z
+	v.X = x
+	v.Y = y
+	v.Z = z
 }
 
 func (v *Vec3D) SetZero() {
-	v.x = 0.0
-	v.y = 0.0
-	v.z = 0.0
+	v.X = 0.0
+	v.Y = 0.0
+	v.Z = 0.0
 }
 
 func (v *Vec3D) Add(vec Vec3D) {
-	v.x += vec.x
-	v.y += vec.y
-	v.z += vec.z
+	v.X += vec.X
+	v.Y += vec.Y
+	v.Z += vec.Z
 }
 
 func (v Vec3D) AddVec(vec Vec3D) Vec3D {
@@ -34,9 +34,9 @@ func (v Vec3D) AddVec(vec Vec3D) Vec3D {
 }
 
 func (v *Vec3D) Sub(vec Vec3D) {
-	v.x = v.x - vec.x
-	v.y = v.y - vec.y
-	v.z = v.z - vec.z
+	v.X = v.X - vec.X
+	v.Y = v.Y - vec.Y
+	v.Z = v.Z - vec.Z
 }
 
 func (v Vec3D) SubVec(vec Vec3D) Vec3D {
@@ -45,9 +45,9 @@ func (v Vec3D) SubVec(vec Vec3D) Vec3D {
 }
 
 func (v *Vec3D) ScalerMul(x float64) {
-	v.x *= x
-	v.y *= x
-	v.z *= x
+	v.X *= x
+	v.Y *= x
+	v.Z *= x
 }
 
 func (v *Vec3D) ScalerDiv(x float64) {
@@ -55,27 +55,27 @@ func (v *Vec3D) ScalerDiv(x float64) {
 		return
 	}
 
-	v.x /= x
-	v.y /= x
-	v.z /= x
+	v.X /= x
+	v.Y /= x
+	v.Z /= x
 }
 
 func (v *Vec3D) IsEqual(vec Vec3D) bool {
-	return ((v.x == vec.x) && (v.y == vec.y) && (v.z == vec.z))
+	return ((v.X == vec.X) && (v.Y == vec.Y) && (v.Z == vec.Z))
 }
 
 func (v *Vec3D) IsNotEqual(vec Vec3D) bool {
-	return (v.x != vec.x) || (v.y != vec.y) || (v.z != vec.z)
+	return (v.X != vec.X) || (v.Y != vec.Y) || (v.Z != vec.Z)
 }
 
 func (v *Vec3D) Length() float64 {
-	return math.Sqrt((v.x * v.x) + (v.y * v.y) + (v.z * v.z))
+	return math.Sqrt((v.X * v.X) + (v.Y * v.Y) + (v.Z * v.Z))
 }
 
 func (v *Vec3D) Dist(vec Vec3D) float64 {
-	x := v.x - vec.x
-	y := v.y - vec.y
-	z := v.z - vec.z
+	x := v.X - vec.X
+	y := v.Y - vec.Y
+	z := v.Z - vec.Z
 
 	return math.Sqrt((x * x) + (y * y) + (z * z))
 }
@@ -87,9 +87,9 @@ func (v *Vec3D) Normalize() (float64, error) {
 		return -1, ErrZeroLen
 	}
 
-	v.x = v.x / l
-	v.y = v.y / l
-	v.z = v.z / l
+	v.X = v.X / l
+	v.Y = v.Y / l
+	v.Z = v.Z / l
 
 	return l, nil
 }
@@ -100,13 +100,13 @@ func (v Vec3D) Directon() Vec3D {
 }
 
 func (v *Vec3D) Reverse() {
-	v.x *= -1
-	v.y *= -1
-	v.z *= -1
+	v.X *= -1
+	v.Y *= -1
+	v.Z *= -1
 }
 
 func (v *Vec3D) Dot(vec Vec3D) float64 {
-	return (v.x * vec.x) + (v.y * vec.y) + (v.z * vec.z)
+	return (v.X * vec.X) + (v.Y * vec.Y) + (v.Z * vec.Z)
 }
 
 func (v *Vec3D) Cross(vec Vec3D) {
@@ -115,9 +115,9 @@ func (v *Vec3D) Cross(vec Vec3D) {
 
 func (v Vec3D) CrossV(vec Vec3D) Vec3D {
 	return Vec3D{
-		x: (v.y * vec.z) - (v.z * vec.y),
-		y: (v.z * vec.x) - (v.x * vec.z),
-		z: (v.x * vec.y) - (v.y * vec.x),
+		X: (v.Y * vec.Z) - (v.Z * vec.Y),
+		Y: (v.Z * vec.X) - (v.X * vec.Z),
+		Z: (v.X * vec.Y) - (v.Y * vec.X),
 	}
 }
 
@@ -166,18 +166,18 @@ func (v *Vec3D) Rotate(qRot Quaternion) error {
 	qInv := qRot.ConjugateQt()
 
 	qVec := Quaternion{
-		w: 0,
-		x: v.x,
-		y: v.y,
-		z: v.z,
+		W: 0,
+		X: v.X,
+		Y: v.Y,
+		Z: v.Z,
 	}
 
 	qRot.Multiply(qVec)
 	qRot.Multiply(qInv)
 
-	v.x = qRot.x
-	v.y = qRot.y
-	v.z = qRot.z
+	v.X = qRot.X
+	v.Y = qRot.Y
+	v.Z = qRot.Z
 
 	return nil
 }
@@ -213,23 +213,23 @@ func (v Vec3D) RotateVecByEuler(e EulerAngle) (Vec3D, error) {
 }
 
 func (v Vec3D) RotateByAxisAngle(a AxisAngle) (Vec3D, error) {
-	_, err := a.axis.Normalize()
+	_, err := a.Axis.Normalize()
 	if err != nil {
 		return Vec3D{}, err
 	}
 
-	cos := math.Cos(a.angle)
-	sin := math.Sin(a.angle)
+	cos := math.Cos(a.Angle)
+	sin := math.Sin(a.Angle)
 
-	dot := v.Dot(a.axis)
-	cross := v.CrossV(a.axis)
+	dot := v.Dot(a.Axis)
+	cross := v.CrossV(a.Axis)
 
 	v.ScalerMul(cos)
 	cross.ScalerMul(sin)
-	a.axis.ScalerMul(dot * (1 - cos))
+	a.Axis.ScalerMul(dot * (1 - cos))
 
 	v.Add(cross)
-	v.Add(a.axis)
+	v.Add(a.Axis)
 
 	return v, nil
 }
@@ -240,17 +240,17 @@ func (v Vec3D) RotateByRotMat3D(r RotMat3D) Vec3D {
 
 func OrthoGraphicProjection(point Vec3D) Vec3D {
 	return Vec3D{
-		x: point.x,
-		y: point.y,
-		z: 0,
+		X: point.X,
+		Y: point.Y,
+		Z: 0,
 	}
 }
 
 func PerspectiveProjection(point Vec3D, focalLen float64) Vec3D {
 	return Vec3D{
-		x: (point.x * focalLen) / point.z,
-		y: (point.y * focalLen) / point.z,
-		z: 0,
+		X: (point.X * focalLen) / point.Z,
+		Y: (point.Y * focalLen) / point.Z,
+		Z: 0,
 	}
 }
 
@@ -260,9 +260,9 @@ func (v Vec3D) LerpV(vec Vec3D, t float64) (Vec3D, error) {
 	}
 
 	return Vec3D{
-		x: v.x + (t * (vec.x - v.x)),
-		y: v.y + (t * (vec.y - v.y)),
-		z: v.z + (t * (vec.z - v.z)),
+		X: v.X + (t * (vec.X - v.X)),
+		Y: v.Y + (t * (vec.Y - v.Y)),
+		Z: v.Z + (t * (vec.Z - v.Z)),
 	}, nil
 }
 
@@ -271,9 +271,9 @@ func (v *Vec3D) Lerp(vec Vec3D, t float64) error {
 		return ErrInvalidInterPolParam
 	}
 
-	v.x = v.x + (t * (vec.x - v.x))
-	v.y = v.y + (t * (vec.y - v.y))
-	v.z = v.z + (t * (vec.z - v.z))
+	v.X = v.X + (t * (vec.X - v.X))
+	v.Y = v.Y + (t * (vec.Y - v.Y))
+	v.Z = v.Z + (t * (vec.Z - v.Z))
 
 	return nil
 }
@@ -301,20 +301,20 @@ func (v Vec3D) SlerpV(vec Vec3D, t float64) (Vec3D, error) {
 	if dot < -0.9995 {
 		axis := Vec3D{}
 
-		if math.Abs(v.x) < math.Abs(v.y) && math.Abs(v.x) < math.Abs(v.z) {
+		if math.Abs(v.X) < math.Abs(v.Y) && math.Abs(v.X) < math.Abs(v.Z) {
 			axis = Vec3D{1, 0, 0}.CrossV(v)
-		} else if math.Abs(v.y) < math.Abs(v.z) {
+		} else if math.Abs(v.Y) < math.Abs(v.Z) {
 			axis = Vec3D{0, 1, 0}.CrossV(v)
 		} else {
 			axis = Vec3D{0, 0, 1}.CrossV(v)
 		}
 
 		axisAng := AxisAngle{
-			axis:  axis,
-			angle: math.Pi * t,
+			Axis:  axis,
+			Angle: math.Pi * t,
 		}
 
-		_, err := axisAng.axis.Normalize()
+		_, err := axisAng.Axis.Normalize()
 		if err != nil {
 			return Vec3D{}, ErrNormalizeError
 		}
@@ -329,9 +329,9 @@ func (v Vec3D) SlerpV(vec Vec3D, t float64) (Vec3D, error) {
 	s2 := math.Sin((t * theta)) / sin
 
 	result := Vec3D{
-		x: (s1 * v.x) + (s2 * vec.x),
-		y: (s1 * v.y) + (s2 * vec.y),
-		z: (s1 * v.z) + (s2 * vec.z),
+		X: (s1 * v.X) + (s2 * vec.X),
+		Y: (s1 * v.Y) + (s2 * vec.Y),
+		Z: (s1 * v.Z) + (s2 * vec.Z),
 	}
 
 	if _, err := result.Normalize(); err != nil {
