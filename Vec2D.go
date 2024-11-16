@@ -71,7 +71,7 @@ func (v *Vec2D) Dist(vec Vec2D) float64 {
 	return math.Sqrt((x * x) + (y * y))
 }
 
-// returns the lengtyh
+// returns the length and err in case of len == 0
 func (v *Vec2D) Normalize() (float64, error) {
 	l := v.Length()
 	if l == 0 {
