@@ -36,7 +36,7 @@ func NormalizeAngleTo2Pi(angle float64) float64 {
 	return angle
 }
 
-func Clamp(f, high, low float64) float64 {
+func Clamp(f, low, high float64) float64 {
 	if f > high {
 		return high
 	}

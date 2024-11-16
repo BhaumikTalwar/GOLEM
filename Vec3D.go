@@ -109,7 +109,11 @@ func (v *Vec3D) Dot(vec Vec3D) float64 {
 	return (v.x * vec.x) + (v.y * vec.y) + (v.z * vec.z)
 }
 
-func (v Vec3D) Cross(vec Vec3D) Vec3D {
+func (v *Vec3D) Cross(vec Vec3D) {
+	*v = v.CrossV(vec)
+}
+
+func (v Vec3D) CrossV(vec Vec3D) Vec3D {
 	return Vec3D{
 		x: (v.y * vec.z) - (v.z * vec.y),
 		y: (v.z * vec.x) - (v.x * vec.z),
@@ -208,6 +212,28 @@ func (v Vec3D) RotateVecByEuler(e EulerAngle) (Vec3D, error) {
 	return v, nil
 }
 
+func (v Vec3D) RotateByAxisAngle(a AxisAngle) (Vec3D, error) {
+	_, err := a.axis.Normalize()
+	if err != nil {
+		return Vec3D{}, err
+	}
+
+	cos := math.Cos(a.angle)
+	sin := math.Sin(a.angle)
+
+	dot := v.Dot(a.axis)
+	cross := v.CrossV(a.axis)
+
+	v.ScalerMul(cos)
+	cross.ScalerMul(sin)
+	a.axis.ScalerMul(dot * (1 - cos))
+
+	v.Add(cross)
+	v.Add(a.axis)
+
+	return v, nil
+}
+
 func OrthoGraphicProjection(point Vec3D) Vec3D {
 	return Vec3D{
 		x: point.x,
@@ -249,5 +275,75 @@ func (v *Vec3D) Lerp(vec Vec3D, t float64) error {
 }
 
 func (v Vec3D) SlerpV(vec Vec3D, t float64) (Vec3D, error) {
+	if t < 0 || t > 1 {
+		return Vec3D{}, ErrInvalidInterPolParam
+	}
 
+	if _, err := v.Normalize(); err != nil {
+		return Vec3D{}, ErrNormalizeError
+	}
+
+	if _, err := vec.Normalize(); err != nil {
+		return Vec3D{}, ErrNormalizeError
+	}
+
+	dot := v.Dot(vec)
+	dot = Clamp(dot, -1, 1)
+
+	if dot > 0.9995 {
+		return v.LerpV(vec, t)
+	}
+
+	if dot < -0.9995 {
+		axis := Vec3D{}
+
+		if math.Abs(v.x) < math.Abs(v.y) && math.Abs(v.x) < math.Abs(v.z) {
+			axis = Vec3D{1, 0, 0}.CrossV(v)
+		} else if math.Abs(v.y) < math.Abs(v.z) {
+			axis = Vec3D{0, 1, 0}.CrossV(v)
+		} else {
+			axis = Vec3D{0, 0, 1}.CrossV(v)
+		}
+
+		axisAng := AxisAngle{
+			axis:  axis,
+			angle: math.Pi * t,
+		}
+
+		_, err := axisAng.axis.Normalize()
+		if err != nil {
+			return Vec3D{}, ErrNormalizeError
+		}
+
+		return v.RotateByAxisAngle(axisAng)
+	}
+
+	theta := math.Acos(dot)
+	sin := math.Sin(theta)
+
+	s1 := math.Sin(((1 - t) * theta)) / sin
+	s2 := math.Sin((t * theta)) / sin
+
+	result := Vec3D{
+		x: (s1 * v.x) + (s2 * vec.x),
+		y: (s1 * v.y) + (s2 * vec.y),
+		z: (s1 * v.z) + (s2 * vec.z),
+	}
+
+	if _, err := result.Normalize(); err != nil {
+		return Vec3D{}, ErrNormalizeError
+	}
+
+	return result, nil
+}
+
+func (v *Vec3D) Slerp(vec Vec3D, t float64) error {
+	result, err := v.SlerpV(vec, t)
+
+	if err != nil {
+		return err
+	}
+
+	*v = result
+	return nil
 }
