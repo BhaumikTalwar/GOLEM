@@ -365,6 +365,7 @@ func (q Quaternion) SlerpQt(qt Quaternion, t float64) (Quaternion, error) {
 	}
 
 	dot := q.Dot(qt)
+	dot = Clamp(dot, -1, 1)
 
 	if dot < 0 {
 		qt.Negate()

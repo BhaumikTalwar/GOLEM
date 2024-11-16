@@ -234,6 +234,10 @@ func (v Vec3D) RotateByAxisAngle(a AxisAngle) (Vec3D, error) {
 	return v, nil
 }
 
+func (v Vec3D) RotateByRotMat3D(r RotMat3D) Vec3D {
+	return r.RotateVec3D(v)
+}
+
 func OrthoGraphicProjection(point Vec3D) Vec3D {
 	return Vec3D{
 		x: point.x,
