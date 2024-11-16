@@ -1,7 +1,6 @@
-package GOLEM
+package golem
 
 import (
-	"errors"
 	"math"
 )
 
@@ -85,7 +84,7 @@ func (v *Vec3D) Normalize() (float64, error) {
 	// returns the lengtyh
 	l := v.Length()
 	if l == 0 {
-		return -1, errors.New("The Length Is Zero")
+		return -1, ErrZeroLen
 	}
 
 	v.x = v.x / l
@@ -137,7 +136,7 @@ func (v Vec3D) Reflection(Nvec Vec3D) Vec3D {
 func (v Vec3D) AngleBetween(vec Vec3D) (float64, error) {
 	lenM := v.Length() * vec.Length()
 	if lenM == 0 {
-		return -1, errors.New("Cant divide by zero")
+		return -1, ErrZeroDiv
 	}
 
 	cos := v.Dot(vec) / (lenM)
@@ -147,7 +146,7 @@ func (v Vec3D) AngleBetween(vec Vec3D) (float64, error) {
 func (v Vec3D) CosAngleBetween(vec Vec3D) (float64, error) {
 	lenM := v.Length() * vec.Length()
 	if lenM == 0 {
-		return -1, errors.New("Cant divide by zero")
+		return -1, ErrZeroDiv
 	}
 
 	return v.Dot(vec) / (lenM), nil

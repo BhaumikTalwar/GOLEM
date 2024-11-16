@@ -1,4 +1,4 @@
-package GOLEM
+package golem
 
 import (
 	"errors"
@@ -80,12 +80,12 @@ func RotMatZ(angle float64) RotMat3D {
 
 func (r *RotMat3D) SetRot(order string, roll, pitch, yaw float64) error {
 	if len(order) != 3 {
-		return errors.New("Invalid String")
+		return ErrInvalidOrderString
 	}
 
 	order = strings.ToUpper(order)
 	if !strings.Contains(order, "X") || !strings.Contains(order, "Y") || !strings.Contains(order, "Z") {
-		return errors.New("Invalid String")
+		return ErrInvalidOrderString
 	}
 
 	r.order = order
@@ -112,15 +112,15 @@ func (r *RotMat3D) SetRot(order string, roll, pitch, yaw float64) error {
 // For casual multiplication use Mat3D.Multiply
 func (r *RotMat3D) MultiplyRotMat(rmat RotMat3D) error {
 	if len(r.order) >= 3 {
-		errors.New("Cannot Have More than 3 axis")
+		return ErrMaxOrder
 	}
 
 	if len(rmat.order) != 1 {
-		errors.New("Invalid Operation: May result in inconsistent Result")
+		return ErrInvalidOperation
 	}
 
 	if strings.Contains(r.order, rmat.order) {
-		return errors.New("Cant Repeat Rotation")
+		return ErrRepeatRot
 	}
 
 	r.Multiply(rmat.Mat3D)
@@ -138,7 +138,7 @@ func (r *RotMat3D) ToEulerAngles() (EulerAngle, error) {
 	e := EulerAngle{}
 
 	if len(r.order) != 3 || !strings.Contains(r.order, "X") || !strings.Contains(r.order, "Y") || !strings.Contains(r.order, "Z") {
-		return e, errors.New("unsupported rotation order: must include 'X', 'Y', and 'Z'")
+		return e, ErrUnsupportedRotOrder
 	}
 
 	switch r.order {
@@ -203,7 +203,7 @@ func (r *RotMat3D) ToEulerAngles() (EulerAngle, error) {
 		}
 
 	default:
-		return e, errors.New("unsupported rotation order")
+		return e, ErrUnsupportedRotOrder
 	}
 
 	return e, nil

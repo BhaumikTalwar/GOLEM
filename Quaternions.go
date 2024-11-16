@@ -1,13 +1,7 @@
-package GOLEM
+package golem
 
 import (
-	"errors"
 	"math"
-)
-
-var (
-	ZeroMagERR    = errors.New("Magnitude Is Zero")
-	InSigAngleERR = errors.New("Insignificant Angle For Rotation")
 )
 
 type Quaternion struct {
@@ -155,7 +149,7 @@ func (q Quaternion) Magnitude() float64 {
 func (q *Quaternion) Normalize() (float64, error) {
 	m := q.Magnitude()
 	if m == 0 {
-		return -1, ZeroMagERR
+		return -1, ErrZeroMag
 	}
 
 	q.w = q.w / m
@@ -201,7 +195,7 @@ func (q Quaternion) ConjugateQt() Quaternion {
 func (q *Quaternion) Inverse() error {
 	magSq := q.Dot(*q)
 	if magSq == 0 {
-		return ZeroMagERR
+		return ErrZeroMag
 	}
 
 	q.Conjugate()
@@ -213,7 +207,7 @@ func (q *Quaternion) Inverse() error {
 func (q Quaternion) InverseQt() (Quaternion, error) {
 	magSq := q.Dot(q)
 	if magSq == 0 {
-		return Quaternion{}, ZeroMagERR
+		return Quaternion{}, ErrZeroMag
 	}
 
 	q.Conjugate()
@@ -280,7 +274,7 @@ func (q Quaternion) ToAxisAngle() (AxisAngle, error) {
 		// returns the arbitary axis of rotation
 		return AxisAngle{
 			axis:  Vec3D{1, 0, 0},
-			angle: 0}, InSigAngleERR
+			angle: 0}, ErrInSigAngle
 	}
 
 	axis := Vec3D{
@@ -346,6 +340,7 @@ func (q *Quaternion) IsEqual(qt Quaternion) bool {
 }
 
 func (q *Quaternion) Slerp(qt Quaternion, t float64) error {
+
 	result, err := q.SlerpQt(qt, t)
 	if err != nil {
 		return err
@@ -358,7 +353,7 @@ func (q *Quaternion) Slerp(qt Quaternion, t float64) error {
 
 func (q Quaternion) SlerpQt(qt Quaternion, t float64) (Quaternion, error) {
 	if t < 0 || t > 1 {
-		return Quaternion{}, errors.New("Invalid t Value")
+		return Quaternion{}, ErrInvalidInterPolParam
 	}
 
 	dot := q.Dot(qt)
@@ -386,7 +381,7 @@ func (q Quaternion) SlerpQt(qt Quaternion, t float64) (Quaternion, error) {
 	}
 
 	if _, err := result.Normalize(); err != nil {
-		return Quaternion{}, errors.New("Cant Normalize the Result")
+		return Quaternion{}, ErrNormalizeError
 	}
 
 	return result, nil
@@ -405,7 +400,7 @@ func (q *Quaternion) Lerp(qt Quaternion, t float64) error {
 
 func (q Quaternion) LerpQt(qt Quaternion, t float64) (Quaternion, error) {
 	if t < 0 || t > 1 {
-		return Quaternion{}, errors.New("Invalid t Value")
+		return Quaternion{}, ErrInvalidInterPolParam
 	}
 
 	result := Quaternion{
@@ -416,7 +411,7 @@ func (q Quaternion) LerpQt(qt Quaternion, t float64) (Quaternion, error) {
 	}
 
 	if _, err := result.Normalize(); err != nil {
-		return Quaternion{}, errors.New("Cant Normalize the Result")
+		return Quaternion{}, ErrNormalizeError
 	}
 
 	return result, nil

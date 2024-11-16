@@ -1,6 +1,4 @@
-package GOLEM
-
-import "errors"
+package golem
 
 type Mat2D [2][2]float64
 

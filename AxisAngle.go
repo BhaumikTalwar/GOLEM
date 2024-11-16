@@ -1,4 +1,4 @@
-package GOLEM
+package golem
 
 import "math"
 

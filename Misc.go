@@ -1,13 +1,7 @@
-package GOLEM
+package golem
 
 import (
-	"errors"
 	"math"
-)
-
-var (
-	ErrZeroDet    = errors.New("Determinat is Zero")
-	ErrInvalidLen = errors.New("Invalid Len Slice")
 )
 
 func ToDegrees(angleRad float64) float64 {

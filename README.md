@@ -1,2 +1,2 @@
 # GOLEM
-A Simple Lightweight easy to use Game Engine Build in Go
+A simple easy to use essential mathematics package for Game Developement and all crazy stuff

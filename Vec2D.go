@@ -1,7 +1,6 @@
-package GOLEM
+package golem
 
 import (
-	"errors"
 	"math"
 )
 
@@ -76,7 +75,7 @@ func (v *Vec2D) Normalize() (float64, error) {
 	// returns the lengtyh
 	l := v.Length()
 	if l == 0 {
-		return -1, errors.New("The Length Is Zero")
+		return -1, ErrZeroLen
 	}
 
 	v.x = v.x / l
