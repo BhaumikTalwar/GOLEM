@@ -69,6 +69,31 @@ func TestLength(t *testing.T) {
 	}
 }
 
+func TestDot(t *testing.T) {
+	tests := []struct {
+		name string
+		v1   m.Vec2D
+		v2   m.Vec2D
+		res  float64
+	}{
+		{"Case 1", m.Vec2D{X: 1, Y: 0}, m.Vec2D{X: 1, Y: 0}, 1},
+		{"Case 2", m.Vec2D{X: 1, Y: 0}, m.Vec2D{X: 0, Y: 1}, 0},
+		{"Case 3", m.Vec2D{X: 1, Y: 1}, m.Vec2D{X: 1, Y: 1}, 2},
+		{"Case 4", m.Vec2D{X: 3, Y: 4}, m.Vec2D{X: 3, Y: 4}, 5},
+		{"Case 5", m.Vec2D{X: 1, Y: 1}, m.Vec2D{X: -1, Y: -1}, -2},
+		{"Case 6", m.Vec2D{X: 1, Y: 1}, m.Vec2D{X: 0.5, Y: 0.5}, 1},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			dot := tt.v1.Dot(tt.v2)
+			if dot != tt.res {
+				t.Errorf("Expected %v, Got %v", tt.res, dot)
+			}
+		})
+	}
+}
+
 func TestDist(t *testing.T) {
 	tests := []struct {
 		name string
@@ -100,20 +125,19 @@ func TestNormalize(t *testing.T) {
 		len  float64
 	}{
 		{"Case 1", m.Vec2D{X: 1, Y: 0}, 1},
-		{"Case 2", m.Vec2D{X: 0, Y: 0}, 0},
+		{"Case 2", m.Vec2D{X: 0, Y: 0}, math.Sqrt(0)},
 		{"Case 3", m.Vec2D{X: -4, Y: 3}, 5},
 		{"Case 4", m.Vec2D{X: 10, Y: 2}, math.Sqrt(104)},
-		{"Case 5", m.Vec2D{X: -9.8, Y: -4}, math.Sqrt(112.040)},
+		{"Case 5", m.Vec2D{X: 10, Y: 5}, math.Sqrt(125)},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			l, err := tt.v.Normalize()
+
 			if l != tt.len || err != nil {
 				t.Errorf("Expected %v, Got %v", tt.len, l)
-			}
-
-			if tt.v.Length() != 1 {
+			} else if tt.v.Length() != 1 {
 				t.Errorf("Didnt Normalized Correctly Even though Expected %v, Got %v", tt.len, l)
 			}
 		})
