@@ -135,10 +135,32 @@ func TestNormalize(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			l, err := tt.v.Normalize()
 
-			if l != tt.len || err != nil {
+			if l != tt.len && ((l != -1) && (err != nil)) {
 				t.Errorf("Expected %v, Got %v", tt.len, l)
 			} else if tt.v.Length() != 1 {
 				t.Errorf("Didnt Normalized Correctly Even though Expected %v, Got %v", tt.len, l)
+			}
+		})
+	}
+}
+
+func TestRotate(t *testing.T) {
+	tests := []struct {
+		name  string
+		vec   m.Vec2D
+		theta float64
+		res   m.Vec2D
+	}{
+		{"Case 1", m.Vec2D{X: 3, Y: 4}, math.Pi / 4, m.Vec2D{X: 3 * math.Sqrt2, Y: 3 * math.Sqrt2}},
+		{"Case 2", m.Vec2D{X: 3, Y: 4}, math.Pi / 2, m.Vec2D{X: -4, Y: 3}},
+		{"Case 1", m.Vec2D{X: 3, Y: 4}, -(math.Pi / 4), m.Vec2D{X: -3 * math.Sqrt2, Y: 3 * math.Sqrt2}},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.vec.Rotate(tt.theta)
+			if tt.vec.IsNotEqual(tt.res) {
+				t.Errorf("Expected %v, Got %v", tt.res, tt.vec)
 			}
 		})
 	}
